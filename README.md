@@ -141,6 +141,7 @@ Stand/Frame
     | [PJ Veltri](https://www.printables.com/@PJVeltri_1590999)            | [Printables](https://www.printables.com/model/692944-base-and-display-holder-for-esp-32-e-paper-weather) |
     | [TheMeanCanEHdian](https://www.printables.com/@TheMeanCanEH_1207348) | [Printables](https://www.printables.com/model/841458-weather-display-enclosure)                          |
     | [MPHarms](https://www.thingiverse.com/mpharms/designs)               | [Thingiverse](https://www.thingiverse.com/thing:6666148)                                                 |
+    | [Plaste-Metz](https://www.printables.com/@PlasteMetz_576567)         | [Printables](https://www.printables.com/model/1160924-weather-station-case)                              |
 
   - If you want to share your own 3D printable designs, your contributions are highly encouraged and welcome!
 
@@ -232,8 +233,9 @@ PlatformIO for VSCode is used for managing dependencies, code compilation, and u
 
    - You will only see this if you have the PlatformIO extension installed.
 
-   - If you are getting errors during the upload process, you may need to install drivers to allow you to upload code to the ESP32.
+   - If using a FireBeetle 2 ESP32-E and you receive the error `Wrong boot mode detected (0x13)! The chip needs to be in download mode.` unplug the power from the board, connect GPIO0 ([labeled 0/D5](https://wiki.dfrobot.com/FireBeetle_Board_ESP32_E_SKU_DFR0654#target_5)) to GND, and power it back up to put the board in download mode.
 
+   - If you are getting other errors during the upload process, you may need to install drivers to allow you to upload code to the ESP32.
 ### OpenWeatherMap API Key
 
 Sign up here to get an API key; it's free. <https://openweathermap.org/api>
