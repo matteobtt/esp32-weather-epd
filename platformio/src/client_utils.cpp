@@ -273,7 +273,7 @@ int getOWMairpollution(WiFiClientSecure &client, owm_resp_air_pollution_t &r)
  * Returns the HTTP Status Code.
  */
 #ifdef USE_HTTP
-int getOMcall(WiFiClient &client, owm_resp_onecall_t &r)
+int getOMCall(WiFiClient &client, owm_resp_onecall_t &r)
 #else
 int getOMCall(WiFiClientSecure &client, owm_resp_onecall_t &r)
 #endif
@@ -312,6 +312,7 @@ int getOMCall(WiFiClientSecure &client, owm_resp_onecall_t &r)
     HTTPClient http;
     http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
     http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
+    http.useHTTP10(true);
     http.begin(client, OM_ENDPOINT, PORT, uri);
     httpResponse = http.GET();
     if (httpResponse == HTTP_CODE_OK)

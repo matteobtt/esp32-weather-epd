@@ -256,6 +256,8 @@ DeserializationError deserializeAirQuality(WiFiClient &json,
 DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
                                               owm_resp_onecall_t &r)
 {
+  int i;
+
   JsonDocument filter;
   filter["current"] = true;
   filter["minutely"] = false;
@@ -278,7 +280,7 @@ DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
 #endif
 
   JsonDocument doc;
-
+  
   DeserializationError error = deserializeJson(doc, json, DeserializationOption::Filter(filter));
 
 #if DEBUG_LEVEL >= 1
