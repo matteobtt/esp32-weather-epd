@@ -283,11 +283,13 @@ int getOMCall(WiFiClientSecure &client, owm_resp_onecall_t &r)
   DeserializationError jsonErr = {};
 
   String uri = "/v1/forecast?latitude=" + LAT + "&longitude=" + LON + "&" +
-               "current=temperature_2m,relative_humidity_2m,apparent_temperature,rain,snowfall,weather_code,cloud_cover,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&" +
-               "hourly=temperature_2m,precipitation_probability,rain,snowfall&" +
-               "daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,sunrise,sunset,daylight_duration,sunshine_duration,uv_index_max,uv_index_clear_sky_max,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,shortwave_radiation_sum,et0_fao_evapotranspiration&" +
-               "timezone=Europe%2FBerlin&timeformat=unixtime";
-  // https://api.open-meteo.com/v1/forecast?latitude=40.7128&longitude=-74.0060&current=temperature_2m,relative_humidity_2m,apparent_temperature,rain,snowfall,weather_code,cloud_cover,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=dew_point_2m,visibility&daily=sunrise,sunset,uv_index_max&timezone=Europe%2FBerlin
+               "current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,cloud_cover,visibility,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&" +
+               "hourly=temperature_2m,cloud_cover,wind_speed_10m,wind_gusts_10m,precipitation_probability,rain,snowfall,weather_code&" +
+               "daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,rain_sum,snowfall_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max&" +
+#ifdef UNITS_TEMP_FAHRENHEIT
+               "temperature_unit=fahrenheit&" +
+#endif
+               "wind_speed_unit=ms&timezone=auto&timeformat=unixtime&forecast_days=5&forecast_hours=" + HOURLY_GRAPH_MAX;
 
 #if !DISPLAY_ALERTS
   // exclude alerts
