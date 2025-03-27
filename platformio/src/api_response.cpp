@@ -87,7 +87,8 @@ DeserializationError deserializeOneCall(WiFiClient &json,
   r.current.weather.id = current_weather["id"].as<int>();
   r.current.weather.main = current_weather["main"].as<const char *>();
   r.current.weather.description = current_weather["description"].as<const char *>();
-  r.current.weather.icon = current_weather["icon"].as<const char *>();
+  // OpenWeatherMap indicates sun is up with d otherwise n for night
+  r.current.is_day = current_weather["icon"].as<String>().endsWith("d");
 
   // minutely forecast is currently unused
   // i = 0;
@@ -125,7 +126,8 @@ DeserializationError deserializeOneCall(WiFiClient &json,
     r.hourly[i].weather.id = hourly_weather["id"].as<int>();
     r.hourly[i].weather.main = hourly_weather["main"].as<const char *>();
     r.hourly[i].weather.description = hourly_weather["description"].as<const char *>();
-    r.hourly[i].weather.icon = hourly_weather["icon"].as<const char *>();
+    // OpenWeatherMap indicates sun is up with d otherwise n for night
+    r.hourly[i].is_day = hourly_weather["icon"].as<String>().endsWith("d");
 
     if (i == OWM_NUM_HOURLY - 1)
     {
@@ -171,7 +173,6 @@ DeserializationError deserializeOneCall(WiFiClient &json,
     r.daily[i].weather.id = daily_weather["id"].as<int>();
     r.daily[i].weather.main = daily_weather["main"].as<const char *>();
     r.daily[i].weather.description = daily_weather["description"].as<const char *>();
-    r.daily[i].weather.icon = daily_weather["icon"].as<const char *>();
 
     if (i == OWM_NUM_DAILY - 1)
     {
@@ -289,7 +290,7 @@ DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
   r.current.wind_gust = current["wind_gusts_10m"].as<float>();
   r.current.wind_deg = current["wind_direction_10m"].as<int>(); // w
   r.current.weather.id = current["weather_code"].as<int>();
-  // r.current.weather.icon // Used to determine whether it's day or night, best changed to current time compared to sunrise/sunset times
+  r.current.is_day = current["is_day"].as<bool>();
 
   // minutely forecast is currently unused
   // i = 0;
@@ -316,8 +317,8 @@ DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
     r.hourly[i].pop = hourly["precipitation_probability"][i].as<float>();
     r.hourly[i].rain_1h = hourly["rain"][i].as<float>();
     r.hourly[i].snow_1h = hourly["snowfall"][i].as<float>();
-    r.hourly[i].weather.id = hourly["weather_code"].as<int>();
-    // r.hourly[i].weather.icon // Used to determine whether it's day or night, best changed to current time compared to sunrise/sunset times
+    r.hourly[i].weather.id = hourly["weather_code"][i].as<int>();
+    r.hourly[i].is_day = hourly["is_day"][i].as<bool>();
 
     if (i == OWM_NUM_HOURLY - 1)
     {
@@ -335,18 +336,14 @@ DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
     // r.daily[i].moon_phase = daily["moon_phase"].as<float>();
     r.daily[i].temp.min = daily["temperature_2m_min"][i].as<float>();
     r.daily[i].temp.max = daily["temperature_2m_max"][i].as<float>();
-    Serial.println("daily temp min: " + String(r.daily[i].temp.min));
-    Serial.println("daily temp max: " + String(r.daily[i].temp.max));
     // Cloud cover percentage is not provided by Open-Meteo as daily
-    // r.daily[i].clouds = daily["cloud_cover"].as<int>();
-    r.daily[i].wind_speed = daily["wind_speed_10m_max"].as<float>();
-    r.daily[i].wind_gust = daily["wind_gusts_10m_max"].as<float>();
-    r.daily[i].pop = daily["precipitation_probability_max"].as<float>();
-    r.daily[i].rain = daily["rain_sum"].as<float>();
-    r.daily[i].snow = daily["snowfall_sum"].as<float>();
+    // r.daily[i].clouds = daily["cloud_cover"][i].as<int>();
+    r.daily[i].wind_speed = daily["wind_speed_10m_max"][i].as<float>();
+    r.daily[i].wind_gust = daily["wind_gusts_10m_max"][i].as<float>();
+    r.daily[i].pop = daily["precipitation_probability_max"][i].as<float>();
+    r.daily[i].rain = daily["rain_sum"][i].as<float>();
+    r.daily[i].snow = daily["snowfall_sum"][i].as<float>();
     r.daily[i].weather.id = daily["weather_code"][i].as<int>();
-    Serial.println("daily weather id: " + String(r.daily[i].weather.id));
-    // r.daily[i].weather.icon // Used to determine whether it's day or night, best changed to current time compared to sunrise/sunset times
 
     if (i == OWM_NUM_DAILY - 1)
     {

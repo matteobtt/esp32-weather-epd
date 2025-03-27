@@ -416,14 +416,6 @@ const uint8_t *getWiFiBitmap16(int rssi)
   }
 } // end getWiFiBitmap24
 
-/* Returns true if icon is a daytime icon, false otherwise.
- */
-bool isDay(String icon)
-{
-  // OpenWeatherMap indicates sun is up with d otherwise n for night
-  return icon.endsWith("d");
-}
-
 /* Returns true if the moon is currently in the sky above, false otherwise.
  */
 bool isMoonInSky(int64_t current_dt, int64_t moonrise_dt, int64_t moonset_dt,
@@ -994,7 +986,7 @@ const uint8_t *getHourlyForecastBitmap32(const owm_hourly_t &hourly,
                                          const owm_daily_t &today)
 {
   const int id = hourly.weather.id;
-  const bool day = isDay(hourly.weather.icon);
+  const bool day = hourly.is_day;
   const bool moon = isMoonInSky(hourly.dt, today.moonrise, today.moonset,
                                 today.moon_phase);
   const bool cloudy = isCloudy(hourly.clouds);
@@ -1026,7 +1018,7 @@ const uint8_t *getCurrentConditionsBitmap196(const owm_current_t &current,
                                              const owm_daily_t &today)
 {
   const int id = current.weather.id;
-  const bool day = isDay(current.weather.icon);
+  const bool day = current.is_day;
   const bool moon = isMoonInSky(current.dt, today.moonrise, today.moonset,
                                 today.moon_phase);
   const bool cloudy = isCloudy(current.clouds);

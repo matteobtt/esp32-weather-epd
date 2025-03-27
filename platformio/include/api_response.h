@@ -36,7 +36,6 @@ typedef struct owm_weather
   int id;             // Weather condition id
   String main;        // Group of weather parameters (Rain, Snow, Extreme etc.)
   String description; // Weather condition within the group (full list of weather conditions). Get the output in your language
-  String icon;        // Weather icon id.
 } owm_weather_t;
 
 /*
@@ -84,6 +83,7 @@ typedef struct owm_current
   int wind_deg;     // Wind direction, degrees (meteorological)
   float rain_1h;    // (where available) Rain volume for last hour, mm
   float snow_1h;    // (where available) Snow volume for last hour, mm
+  bool is_day;      // Is set to true if the sun is currently up
   owm_weather_t weather;
 } owm_current_t;
 
@@ -116,6 +116,7 @@ typedef struct owm_hourly
   float pop;        // Probability of precipitation. The values of the parameter vary between 0 and 1, where 0 is equal to 0%, 1 is equal to 100%
   float rain_1h;    // (where available) Rain volume for last hour, mm
   float snow_1h;    // (where available) Snow volume for last hour, mm
+  bool is_day;      // Is set to true if the sun is up at the time
   owm_weather_t weather;
 } owm_hourly_t;
 
