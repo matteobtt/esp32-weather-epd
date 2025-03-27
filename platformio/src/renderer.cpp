@@ -716,7 +716,7 @@ void drawCurrentConditions(const owm_current_t &current,
 #if DISPLAY_DAILY_PRECIP
       float dailyPrecip;
 #if defined(UNITS_DAILY_PRECIP_POP)
-      dailyPrecip = daily[i].pop * 100;
+      dailyPrecip = daily[i].pop;
       dataStr = String(static_cast<int>(dailyPrecip));
       unitStr = "%";
 #else
@@ -1187,7 +1187,7 @@ void drawCurrentConditions(const owm_current_t &current,
       }
 
 #ifdef UNITS_HOURLY_PRECIP_POP
-      float precipVal = hourly[i].pop * 100;
+      float precipVal = hourly[i].pop;
 #else
     float precipVal = hourly[i].rain_1h + hourly[i].snow_1h;
 #ifdef UNITS_HOURLY_PRECIP_CENTIMETERS

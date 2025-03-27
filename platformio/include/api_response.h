@@ -113,7 +113,7 @@ typedef struct owm_hourly
   float wind_speed; // Wind speed. Wind speed. Units – default: metre/sec, metric: metre/sec, imperial: miles/hour.
   float wind_gust;  // (where available) Wind gust. Units – default: metre/sec, metric: metre/sec, imperial: miles/hour.
   int wind_deg;     // Wind direction, degrees (meteorological)
-  float pop;        // Probability of precipitation. The values of the parameter vary between 0 and 1, where 0 is equal to 0%, 1 is equal to 100%
+  int pop;          // Probability of precipitation, %
   float rain_1h;    // (where available) Rain volume for last hour, mm
   float snow_1h;    // (where available) Snow volume for last hour, mm
   bool is_day;      // Is set to true if the sun is up at the time
@@ -142,7 +142,7 @@ typedef struct owm_daily
   float wind_speed; // Wind speed. Wind speed. Units – default: metre/sec, metric: metre/sec, imperial: miles/hour.
   float wind_gust;  // (where available) Wind gust. Units – default: metre/sec, metric: metre/sec, imperial: miles/hour.
   int wind_deg;     // Wind direction, degrees (meteorological)
-  float pop;        // Probability of precipitation. The values of the parameter vary between 0 and 1, where 0 is equal to 0%, 1 is equal to 100%
+  int pop;          // Probability of precipitation, %
   float rain;       // (where available) Precipitation volume, mm
   float snow;       // (where available) Snow volume, mm
   owm_weather_t weather;

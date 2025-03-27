@@ -119,7 +119,7 @@ DeserializationError deserializeOneCall(WiFiClient &json,
     r.hourly[i].wind_speed = hourly["wind_speed"].as<float>();
     r.hourly[i].wind_gust = hourly["wind_gust"].as<float>();
     r.hourly[i].wind_deg = hourly["wind_deg"].as<int>();
-    r.hourly[i].pop = hourly["pop"].as<float>();
+    r.hourly[i].pop = hourly["pop"].as<float>() * 100;
     r.hourly[i].rain_1h = hourly["rain"]["1h"].as<float>();
     r.hourly[i].snow_1h = hourly["snow"]["1h"].as<float>();
     JsonObject hourly_weather = hourly["weather"][0];
@@ -166,7 +166,7 @@ DeserializationError deserializeOneCall(WiFiClient &json,
     r.daily[i].wind_speed = daily["wind_speed"].as<float>();
     r.daily[i].wind_gust = daily["wind_gust"].as<float>();
     r.daily[i].wind_deg = daily["wind_deg"].as<int>();
-    r.daily[i].pop = daily["pop"].as<float>();
+    r.daily[i].pop = daily["pop"].as<float>() * 100;
     r.daily[i].rain = daily["rain"].as<float>();
     r.daily[i].snow = daily["snow"].as<float>();
     JsonObject daily_weather = daily["weather"][0];
@@ -314,7 +314,7 @@ DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
     r.hourly[i].clouds = hourly["cloud_cover"][i].as<int>();
     r.hourly[i].wind_speed = hourly["wind_speed_10m"][i].as<float>();
     r.hourly[i].wind_gust = hourly["wind_gusts_10m"][i].as<float>();
-    r.hourly[i].pop = hourly["precipitation_probability"][i].as<float>();
+    r.hourly[i].pop = hourly["precipitation_probability"][i].as<int>();
     r.hourly[i].rain_1h = hourly["rain"][i].as<float>();
     r.hourly[i].snow_1h = hourly["snowfall"][i].as<float>();
     r.hourly[i].weather.id = hourly["weather_code"][i].as<int>();
@@ -340,7 +340,7 @@ DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
     // r.daily[i].clouds = daily["cloud_cover"][i].as<int>();
     r.daily[i].wind_speed = daily["wind_speed_10m_max"][i].as<float>();
     r.daily[i].wind_gust = daily["wind_gusts_10m_max"][i].as<float>();
-    r.daily[i].pop = daily["precipitation_probability_max"][i].as<float>();
+    r.daily[i].pop = daily["precipitation_probability_max"][i].as<int>();
     r.daily[i].rain = daily["rain_sum"][i].as<float>();
     r.daily[i].snow = daily["snowfall_sum"][i].as<float>();
     r.daily[i].weather.id = daily["weather_code"][i].as<int>();
