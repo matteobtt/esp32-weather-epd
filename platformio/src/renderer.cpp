@@ -281,17 +281,17 @@ void drawCurrentConditions(const owm_current_t &current,
 
   // current temp
 #ifdef UNITS_TEMP_KELVIN
-  dataStr = String(static_cast<int>(std::round(current.temp)));
+  dataStr = String(static_cast<int>(
+      std::round(celsius_to_kelvin(current.temp))));
   unitStr = TXT_UNITS_TEMP_KELVIN;
 #endif
 #ifdef UNITS_TEMP_CELSIUS
-  dataStr = String(static_cast<int>(
-      std::round(kelvin_to_celsius(current.temp))));
+  dataStr = String(static_cast<int>(std::round(current.temp)));
   unitStr = TXT_UNITS_TEMP_CELSIUS;
 #endif
 #ifdef UNITS_TEMP_FAHRENHEIT
   dataStr = String(static_cast<int>(
-      std::round(kelvin_to_fahrenheit(current.temp))));
+      std::round(celsius_to_fahrenheit(current.temp))));
   unitStr = TXT_UNITS_TEMP_FAHRENHEIT;
 #endif
   // FONT_**_temperature fonts only have the character set used for displaying
@@ -307,17 +307,13 @@ void drawCurrentConditions(const owm_current_t &current,
 
   // current feels like
 #ifdef UNITS_TEMP_KELVIN
-  dataStr = String(TXT_FEELS_LIKE) + ' ' + String(static_cast<int>(std::round(current.feels_like)));
+  dataStr = String(TXT_FEELS_LIKE) + ' ' + String(static_cast<int>(std::round(celsius_to_kelvin(current.feels_like))));
 #endif
 #ifdef UNITS_TEMP_CELSIUS
-  // dataStr = String(TXT_FEELS_LIKE) + ' '
-  //           + String(static_cast<int>(round(
-  //                    kelvin_to_celsius(current.feels_like))))
-  //           + '\xB0';
-  dataStr = String(TXT_FEELS_LIKE) + ' ' + String(static_cast<int>(std::round(kelvin_to_celsius(current.feels_like)))) + '\260';
+  dataStr = String(TXT_FEELS_LIKE) + ' ' + String(static_cast<int>(std::round(current.feels_like))) + '\260';
 #endif
 #ifdef UNITS_TEMP_FAHRENHEIT
-  dataStr = String(TXT_FEELS_LIKE) + ' ' + String(static_cast<int>(std::round(kelvin_to_fahrenheit(current.feels_like)))) + '\260';
+  dataStr = String(TXT_FEELS_LIKE) + ' ' + String(static_cast<int>(std::round(celsius_to_fahrenheit(current.feels_like)))) + '\260';
 #endif
   display.setFont(&FONT_12pt8b);
 #ifndef DISP_BW_V1
@@ -696,23 +692,21 @@ void drawCurrentConditions(const owm_current_t &current,
       display.setFont(&FONT_8pt8b);
       drawString(x + 31, 98 + 69 / 2 + 38 - 6 + 12, "|", CENTER);
 #ifdef UNITS_TEMP_KELVIN
-      hiStr = String(static_cast<int>(std::round(daily[i].temp.max)));
-      loStr = String(static_cast<int>(std::round(daily[i].temp.min)));
+      hiStr = String(static_cast<int>(
+                  std::round(celsius_to_kelvin(daily[i].temp.max))));
+      loStr = String(static_cast<int>(
+                  std::round(celsius_to_kelvin(daily[i].temp.min))));
 #endif
 #ifdef UNITS_TEMP_CELSIUS
-      hiStr = String(static_cast<int>(
-                  std::round(kelvin_to_celsius(daily[i].temp.max)))) +
-              "\260";
-      loStr = String(static_cast<int>(
-                  std::round(kelvin_to_celsius(daily[i].temp.min)))) +
-              "\260";
+      hiStr = String(static_cast<int>(std::round(daily[i].temp.max))) + "\260";
+      loStr = String(static_cast<int>(std::round(daily[i].temp.min))) + "\260";
 #endif
 #ifdef UNITS_TEMP_FAHRENHEIT
       hiStr = String(static_cast<int>(
-                  std::round(kelvin_to_fahrenheit(daily[i].temp.max)))) +
+                  std::round(celsius_to_fahrenheit(daily[i].temp.max)))) +
               "\260";
       loStr = String(static_cast<int>(
-                  std::round(kelvin_to_fahrenheit(daily[i].temp.min)))) +
+                  std::round(celsius_to_fahrenheit(daily[i].temp.min)))) +
               "\260";
 #endif
       drawString(x + 31 - 4, 98 + 69 / 2 + 38 - 6 + 12, hiStr, RIGHT);
@@ -898,22 +892,22 @@ void drawCurrentConditions(const owm_current_t &current,
     return result >= 0 ? result : result + b;
   }
 
-  /* Convert temperature in kelvin to the display y coordinate to be plotted.
+  /* Convert temperature in celsius to the display y coordinate to be plotted.
    */
-  int kelvin_to_plot_y(float kelvin, int tempBoundMin, float yPxPerUnit,
+  int celsius_to_plot_y(float temp, int tempBoundMin, float yPxPerUnit,
                        int yBoundMin)
   {
 #ifdef UNITS_TEMP_KELVIN
     return static_cast<int>(std::round(
-        yBoundMin - (yPxPerUnit * (kelvin - tempBoundMin))));
+        yBoundMin - (yPxPerUnit * (celsius_to_kelvin(temp) - tempBoundMin))));
 #endif
 #ifdef UNITS_TEMP_CELSIUS
     return static_cast<int>(std::round(
-        yBoundMin - (yPxPerUnit * (kelvin_to_celsius(kelvin) - tempBoundMin))));
+        yBoundMin - (yPxPerUnit * (temp - tempBoundMin))));
 #endif
 #ifdef UNITS_TEMP_FAHRENHEIT
     return static_cast<int>(std::round(
-        yBoundMin - (yPxPerUnit * (kelvin_to_fahrenheit(kelvin) - tempBoundMin))));
+        yBoundMin - (yPxPerUnit * (celsius_to_fahrenheit(temp) - tempBoundMin))));
 #endif
   }
 
@@ -931,14 +925,13 @@ void drawCurrentConditions(const owm_current_t &current,
     // calculate y max/min and intervals
     int yMajorTicks = 5;
 #ifdef UNITS_TEMP_KELVIN
-    float tempMin = hourly[0].temp;
+    float tempMin = celsius_to_kelvin(hourly[0].temp);
 #endif
 #ifdef UNITS_TEMP_CELSIUS
-    // float tempMin = kelvin_to_celsius(hourly[0].temp);
     float tempMin = hourly[0].temp;
 #endif
 #ifdef UNITS_TEMP_FAHRENHEIT
-    float tempMin = kelvin_to_fahrenheit(hourly[0].temp);
+    float tempMin = celsius_to_fahrenheit(hourly[0].temp);
 #endif
     float tempMax = tempMin;
 #ifdef UNITS_HOURLY_PRECIP_POP
@@ -951,14 +944,13 @@ void drawCurrentConditions(const owm_current_t &current,
     for (int i = 1; i < HOURLY_GRAPH_MAX; ++i)
     {
 #ifdef UNITS_TEMP_KELVIN
-      newTemp = hourly[i].temp;
+      newTemp = celsius_to_kelvin(hourly[i].temp);
 #endif
 #ifdef UNITS_TEMP_CELSIUS
-      // newTemp = kelvin_to_celsius(hourly[i].temp);
       newTemp = hourly[i].temp;
 #endif
 #ifdef UNITS_TEMP_FAHRENHEIT
-      newTemp = kelvin_to_fahrenheit(hourly[i].temp);
+      newTemp = celsius_to_fahrenheit(hourly[i].temp);
 #endif
       tempMin = std::min(tempMin, newTemp);
       tempMax = std::max(tempMax, newTemp);
@@ -1129,7 +1121,7 @@ void drawCurrentConditions(const owm_current_t &current,
     y_t.reserve(HOURLY_GRAPH_MAX);
     for (int i = 0; i < HOURLY_GRAPH_MAX; ++i)
     {
-      y_t[i] = kelvin_to_plot_y(hourly[i].temp, tempBoundMin, yPxPerUnit, yPos1);
+      y_t[i] = celsius_to_plot_y(hourly[i].temp, tempBoundMin, yPxPerUnit, yPos1);
       x_t[i] = static_cast<int>(std::round(xPos0 + (i * xInterval) + (0.5 * xInterval)));
     }
 
