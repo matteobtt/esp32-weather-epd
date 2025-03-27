@@ -256,32 +256,9 @@ DeserializationError deserializeAirQuality(WiFiClient &json,
 DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
                                               owm_resp_onecall_t &r)
 {
-  int i;
-
-  JsonDocument filter;
-  filter["current"] = true;
-  filter["minutely"] = false;
-  filter["hourly"] = true;
-  filter["daily"] = true;
-#if !DISPLAY_ALERTS
-  filter["alerts"] = false;
-#else
-  // description can be very long so they are filtered out to save on memory
-  // along with sender_name
-  for (int i = 0; i < OWM_NUM_ALERTS; ++i)
-  {
-    filter["alerts"][i]["sender_name"] = false;
-    filter["alerts"][i]["event"] = true;
-    filter["alerts"][i]["start"] = true;
-    filter["alerts"][i]["end"] = true;
-    filter["alerts"][i]["description"] = false;
-    filter["alerts"][i]["tags"] = true;
-  }
-#endif
-
   JsonDocument doc;
   
-  DeserializationError error = deserializeJson(doc, json, DeserializationOption::Filter(filter));
+  DeserializationError error = deserializeJson(doc, json);
 
 #if DEBUG_LEVEL >= 1
   Serial.println("[debug] doc.overflowed() : " + String(doc.overflowed()));
@@ -352,6 +329,7 @@ DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
   for (size_t i = 0; i < days; i++)
   {
     r.daily[i].dt = daily["time"][i].as<int64_t>();
+    // TODO: Open-Meteo does not provide lunar data. Calculate them or use another API.
     // r.daily[i].moonrise   = daily["moonrise"]  .as<int64_t>();
     // r.daily[i].moonset    = daily["moonset"]   .as<int64_t>();
     // r.daily[i].moon_phase = daily["moon_phase"].as<float>();
@@ -359,7 +337,8 @@ DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
     r.daily[i].temp.max = daily["temperature_2m_max"][i].as<float>();
     Serial.println("daily temp min: " + String(r.daily[i].temp.min));
     Serial.println("daily temp max: " + String(r.daily[i].temp.max));
-    // r.daily[i].clouds = daily["cloud_cover"].as<int>(); // Not available in Open-Meteo as daily
+    // Cloud cover percentage is not provided by Open-Meteo as daily
+    // r.daily[i].clouds = daily["cloud_cover"].as<int>();
     r.daily[i].wind_speed = daily["wind_speed_10m_max"].as<float>();
     r.daily[i].wind_gust = daily["wind_gusts_10m_max"].as<float>();
     r.daily[i].pop = daily["precipitation_probability_max"].as<float>();
@@ -375,6 +354,8 @@ DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
     }
   }
 
+  // TODO: Open-Meteo does not issue alerts, use another API.
+  /*
 #if DISPLAY_ALERTS
   i = 0;
   for (JsonObject alerts : doc["alerts"].as<JsonArray>())
@@ -395,6 +376,7 @@ DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
     ++i;
   }
 #endif
+  */
 
   return error;
 } // end deserializeOpenMeteoCall
