@@ -251,7 +251,11 @@ void setup()
   client.setInsecure();
 #elif defined(USE_HTTPS_WITH_CERT_VERIF)
   WiFiClientSecure client;
+#if defined(USE_OPEN_WEATHER_MAP)
   client.setCACert(cert_Sectigo_RSA_Organization_Validation_Secure_Server_CA);
+#elif defined(USE_OPEN_METEO)
+  client.setCACert(cert_R11);
+#endif
 #endif
 #if defined(USE_OPEN_WEATHER_MAP)
   int rxStatus = getOWMonecall(client, owm_onecall);
