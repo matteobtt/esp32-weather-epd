@@ -21,7 +21,7 @@
 #include <Arduino.h>
 #include "api_response.h"
 #include "config.h"
-#ifdef USE_HTTP
+#if HTTP_MODE == HTTP
   #include <WiFiClient.h>
 #else
   #include <WiFiClientSecure.h>
@@ -31,7 +31,7 @@ wl_status_t startWiFi(int &wifiRSSI);
 void killWiFi();
 bool waitForSNTPSync(tm *timeInfo);
 bool printLocalTime(tm *timeInfo);
-#ifdef USE_HTTP
+#if HTTP_MODE == HTTP
   int getOWMonecall(WiFiClient &client, owm_resp_onecall_t &r);
   int getOWMairpollution(WiFiClient &client, owm_resp_air_pollution_t &r);
 #else

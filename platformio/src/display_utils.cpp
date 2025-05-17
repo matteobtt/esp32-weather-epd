@@ -883,14 +883,13 @@ enum alert_category getAlertCategory(const owm_alerts_t &alert)
   return alert_category::NOT_FOUND;
 } // end getAlertCategory
 
-#ifdef WIND_ICONS_CARDINAL
+#if ARROW_PRECISION == CARDINAL
 static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_0deg_24x24,    // N
   wind_direction_meteorological_90deg_24x24,   // E
   wind_direction_meteorological_180deg_24x24,  // S
   wind_direction_meteorological_270deg_24x24}; // W
-#endif // end WIND_ICONS_CARDINAL
-#ifdef WIND_ICONS_INTERCARDINAL
+#elif ARROW_PRECISION == INTERCARDINAL
 static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_0deg_24x24,    // N
   wind_direction_meteorological_45deg_24x24,   // NE
@@ -900,8 +899,7 @@ static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_225deg_24x24,  // SW
   wind_direction_meteorological_270deg_24x24,  // W
   wind_direction_meteorological_315deg_24x24}; // NW
-#endif // end WIND_ICONS_INTERCARDINAL
-#ifdef WIND_ICONS_SECONDARY_INTERCARDINAL
+#elif ARROW_PRECISION == SECONDARY_INTERCARDINAL
 static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_0deg_24x24,      // N
   wind_direction_meteorological_22_5deg_24x24,   // NNE
@@ -919,8 +917,7 @@ static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_292_5deg_24x24,  // WNW
   wind_direction_meteorological_315deg_24x24,    // NW
   wind_direction_meteorological_337_5deg_24x24}; // NNW
-#endif // end WIND_ICONS_SECONDARY_INTERCARDINAL
-#ifdef WIND_ICONS_TERTIARY_INTERCARDINAL
+#elif ARROW_PRECISION == TERTIARY_INTERCARDINAL
 static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_0deg_24x24,       // N
   wind_direction_meteorological_11_25deg_24x24,   // NbE
@@ -954,8 +951,7 @@ static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_326_25deg_24x24,  // NWbN
   wind_direction_meteorological_337_5deg_24x24,   // NNW
   wind_direction_meteorological_348_75deg_24x24}; // NbW
-#endif // end WIND_ICONS_TERTIARY_INTERCARDINAL
-#ifdef WIND_ICONS_360
+#elif ARROW_PRECISION == ANY_360
 static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_0deg_24x24,
   wind_direction_meteorological_1deg_24x24,
@@ -1317,7 +1313,7 @@ static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_357deg_24x24,
   wind_direction_meteorological_358deg_24x24,
   wind_direction_meteorological_359deg_24x24};
-#endif // end WIND_ICONS_360
+#endif
 
 /* Returns a 24x24 wind direction icon bitmap for angles 0 to 359 degrees
  * Parameter is meteorological wind direction, arrow points in the direction the
@@ -1346,13 +1342,13 @@ const uint8_t *getWindBitmap24(int windDeg)
  */
 const char *getCompassPointNotation(int windDeg)
 {
-#if defined(WIND_INDICATOR_CPN_CARDINAL)
+#if WIND_DIRECTION_LABEL == CARDINAL
   const int precision = 4;
-#elif defined(WIND_INDICATOR_CPN_INTERCARDINAL)
+#elif WIND_DIRECTION_LABEL == INTERCARDINAL
   const int precision = 8;
-#elif defined(WIND_INDICATOR_CPN_SECONDARY_INTERCARDINAL)
+#elif WIND_DIRECTION_LABEL == SECONDARY_INTERCARDINAL
   const int precision = 16;
-#elif defined(WIND_INDICATOR_CPN_TERTIARY_INTERCARDINAL)
+#elif WIND_DIRECTION_LABEL == TERTIARY_INTERCARDINAL
   const int precision = 32;
 #else
   const int precision = 4;

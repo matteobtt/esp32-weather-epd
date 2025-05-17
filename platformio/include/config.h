@@ -21,116 +21,104 @@
 #include <cstdint>
 #include <Arduino.h>
 
+#include "define_values.h"
+#include "config_custom.h"
+
+#ifdef USE_IMPERIAL_UNITS
+  #ifndef UNITS_TEMP
+    #define UNITS_TEMP FAHRENHEIT
+  #endif
+  #ifndef UNITS_SPEED
+    #define UNITS_SPEED MILESPERHOUR
+  #endif
+  #ifndef UNITS_PRES
+    #define UNITS_PRES INCHESOFMERCURY
+  #endif
+  #ifndef UNITS_DIST
+    #define UNITS_DIST MILES
+  #endif
+  #ifndef UNITS_DAILY_PRECIP
+    #define UNITS_DAILY_PRECIP INCHES
+  #endif
+#endif
+
+// DEFAULT CONFIGS
+
 // E-PAPER PANEL
 // This project supports the following E-Paper panels:
 //   DISP_BW_V2 - 7.5in e-Paper (v2)      800x480px  Black/White
 //   DISP_3C_B  - 7.5in e-Paper (B)       800x480px  Red/Black/White
 //   DISP_7C_F  - 7.3in ACeP e-Paper (F)  800x480px  7-Color
 //   DISP_BW_V1 - 7.5in e-Paper (v1)      640x384px  Black/White
-// Uncomment the macro that identifies your physical panel.
-#define DISP_BW_V2
-// #define DISP_3C_B
-// #define DISP_7C_F
-// #define DISP_BW_V1
+#ifndef EPD_PANEL
+  #define EPD_PANEL DISP_BW_V2
+#endif
 
 // E-PAPER DRIVER BOARD
 // The DESPI-C02 is the only officially supported driver board.
 // Support for the Waveshare rev2.2 and rev2.3 is deprecated.
 // The Waveshare rev2.2 is no longer in production.
 // Users of the Waveshare rev2.3 have reported experiencing low contrast issues.
-// Uncomment the macro that identifies your driver board hardware.
-#define DRIVER_DESPI_C02
-// #define DRIVER_WAVESHARE
+#ifndef EPD_DRIVER
+  #define EPD_DRIVER DRIVER_DESPI_C02
+#endif
 
 // INDOOR ENVIRONMENT SENSOR
-// Uncomment the macro that identifies your sensor.
-#define SENSOR_BME280
-// #define SENSOR_BME680
+#ifndef SENSOR
+  #define SENSOR BME280
+#endif
 
 // 3 COLOR E-INK ACCENT COLOR
 // Defines the 3rd color to be used when a 3+ color display is selected.
-#if defined(DISP_3C_B) || defined(DISP_7C_F)
-  // #define ACCENT_COLOR GxEPD_BLACK
+#if (EPD_PANEL == DISP_3C_B || EPD_PANEL == DISP_7C_F) && !(defined(ACCENT_COLOR))
   #define ACCENT_COLOR GxEPD_RED
-  // #define ACCENT_COLOR GxEPD_GREEN
-  // #define ACCENT_COLOR GxEPD_BLUE
-  // #define ACCENT_COLOR GxEPD_YELLOW
-  // #define ACCENT_COLOR GxEPD_ORANGE
 #endif
-
-// LOCALE
-// If your locale is not here, you can add it by copying and modifying one of
-// the files in src/locales. Please feel free to create a pull request to add
-// official support for your locale.
-//   Language (Territory)            code
-//   German (Germany)                de_DE
-//   English (United Kingdom)        en_GB
-//   English (United States)         en_US
-//   Estonian (Estonia)              et_EE
-//   Finnish (Finland)               fi_FI
-//   French (France)                 fr_FR
-//   Italiano (Italia)               it_IT
-//   Dutch (Belgium)                 nl_BE
-//   Portuguese (Brazil)             pt_BR
-#define LOCALE en_US
-
-// UNITS
-// Define exactly one macro for each measurement type below.
 
 // UNITS - TEMPERATURE
 //   Metric   : Celsius
 //   Imperial : Fahrenheit
-// #define UNITS_TEMP_KELVIN
-// #define UNITS_TEMP_CELSIUS
-#define UNITS_TEMP_FAHRENHEIT
+#ifndef UNITS_TEMP
+  #define UNITS_TEMP CELSIUS
+#endif
 
 // UNITS - WIND SPEED
 //   Metric   : Kilometers per Hour
 //   Imperial : Miles per Hour
-// #define UNITS_SPEED_METERSPERSECOND
-// #define UNITS_SPEED_FEETPERSECOND
-// #define UNITS_SPEED_KILOMETERSPERHOUR
-#define UNITS_SPEED_MILESPERHOUR
-// #define UNITS_SPEED_KNOTS
-// #define UNITS_SPEED_BEAUFORT
+#ifndef UNITS_SPEED
+  #define UNITS_SPEED KILOMETERSPERHOUR
+#endif
 
 // UNITS - PRESSURE
 //   Metric   : Millibars
 //   Imperial : Inches of Mercury
-// #define UNITS_PRES_HECTOPASCALS
-// #define UNITS_PRES_PASCALS
-// #define UNITS_PRES_MILLIMETERSOFMERCURY
-#define UNITS_PRES_INCHESOFMERCURY
-// #define UNITS_PRES_MILLIBARS
-// #define UNITS_PRES_ATMOSPHERES
-// #define UNITS_PRES_GRAMSPERSQUARECENTIMETER
-// #define UNITS_PRES_POUNDSPERSQUAREINCH
+#ifndef UNITS_PRES
+  #define UNITS_PRES MILLIBARS
+#endif
 
 // UNITS - VISIBILITY DISTANCE
 //   Metric   : Kilometers
 //   Imperial : Miles
-// #define UNITS_DIST_KILOMETERS
-#define UNITS_DIST_MILES
+#ifndef UNITS_DIST
+  #define UNITS_DIST KILOMETERS
+#endif
 
 // UNITS - PRECIPITATION (HOURLY)
 // Measure of precipitation.
 // This can either be Probability of Precipitation (PoP) or hourly volume.
 //   Metric   : Millimeters
 //   Imperial : Inches
-#define UNITS_HOURLY_PRECIP_POP
-// #define UNITS_HOURLY_PRECIP_MILLIMETERS
-// #define UNITS_HOURLY_PRECIP_CENTIMETERS
-// #define UNITS_HOURLY_PRECIP_INCHES
+#ifndef UNITS_HOURLY_PRECIP
+  #define UNITS_HOURLY_PRECIP POP
+#endif
 
 // UNITS - PRECIPITATION (DAILY)
 // Measure of precipitation.
 // This can either be Probability of Precipitation (PoP) or daily volume.
 //   Metric   : Millimeters
 //   Imperial : Inches
-// #define UNITS_DAILY_PRECIP_POP
-// #define UNITS_DAILY_PRECIP_MILLIMETERS
-// #define UNITS_DAILY_PRECIP_CENTIMETERS
-#define UNITS_DAILY_PRECIP_INCHES
+#ifndef UNITS_DAILY_PRECIP
+  #define UNITS_DAILY_PRECIP MILLIMETERS
+#endif
 
 // Hypertext Transfer Protocol (HTTP)
 // HTTP
@@ -150,36 +138,32 @@
 //   Running cert.py will generate an updated cert.h file.
 //   The current certificate for api.openweathermap.org is valid until
 //   2026-04-10 23:59:59+00:00
-// (uncomment exactly one)
-// #define USE_HTTP
-// #define USE_HTTPS_NO_CERT_VERIF
-#define USE_HTTPS_WITH_CERT_VERIF // REQUIRES MANUAL UPDATE WHEN CERT EXPIRES
+#ifndef HTTP_MODE
+  #define HTTP_MODE HTTPS_WITH_CERT_VERIF
+#endif
 
-// WIND DIRECTION INDICATOR
-// Choose whether the wind direction indicator should be an arrow, number, or
+// WIND DIRECTION LABEL
+// Choose whether the wind direction label should be a number or
 // expressed in Compass Point Notation (CPN).
-// The arrow indicator can be combined with NUMBER or CPN.
+// Set the macro to 0 to disable.
 //
 //   PRECISION                  #     ERROR   EXAMPLE
 //   Cardinal                   4  ±45.000°   E
 //   Intercardinal (Ordinal)    8  ±22.500°   NE
 //   Secondary Intercardinal   16  ±11.250°   NNE
 //   Tertiary Intercardinal    32   ±5.625°   NbE
-#define WIND_INDICATOR_ARROW
-// #define WIND_INDICATOR_NUMBER
-// #define WIND_INDICATOR_CPN_CARDINAL
-// #define WIND_INDICATOR_CPN_INTERCARDINAL
-// #define WIND_INDICATOR_CPN_SECONDARY_INTERCARDINAL
-// #define WIND_INDICATOR_CPN_TERTIARY_INTERCARDINAL
-// #define WIND_INDICATOR_NONE
+#ifndef WIND_DIRECTION_LABEL
+  #define WIND_DIRECTION_LABEL 0
+#endif
 
 // WIND DIRECTION ICON PRECISION
-// The wind direction icon shown to the left of the wind speed can indicate wind
+// The arrow shown to the left of the wind speed can indicate wind
 // direction with a minimum error of ±0.5°. This uses more flash storage because
 // 360 24x24 wind direction icons must be stored, totaling ~25kB. For either
 // preference or in case flash space becomes a concern there are a handful of
 // selectable options listed below. 360 points seems excessive, but the option
 // is there.
+// Set the macro to 0 to disable.
 //
 //   PRECISION                  #     ERROR  STORAGE
 //   Cardinal                   4  ±45.000°     288B  E
@@ -187,12 +171,9 @@
 //   Secondary Intercardinal   16  ±11.250°   1,152B  NNE
 //   Tertiary Intercardinal    32   ±5.625°   2,304B  NbE
 //   (360)                    360   ±0.500°  25,920B  1°
-// Uncomment your preferred wind level direction precision.
-// #define WIND_ICONS_CARDINAL
-// #define WIND_ICONS_INTERCARDINAL
-#define WIND_ICONS_SECONDARY_INTERCARDINAL
-// #define WIND_ICONS_TERTIARY_INTERCARDINAL
-// #define WIND_ICONS_360
+#ifndef ARROW_PRECISION
+  #define ARROW_PRECISION SECONDARY_INTERCARDINAL
+#endif
 
 // FONTS
 // A handful of popular Open Source typefaces have been included with this
@@ -222,7 +203,9 @@
 //   FreeSans font, but this project supports the ability to modularly swap
 //   fonts. Using a font other than FreeSans may result in undesired spacing or
 //   other artifacts.
-#define FONT_HEADER "fonts/FreeSans.h"
+#ifndef FONT_HEADER
+  #define FONT_HEADER "fonts/FreeSans.h"
+#endif
 
 // DAILY PRECIPITATION
 // Daily precipitation indicated under Hi|Lo can optionally be configured using
@@ -230,14 +213,18 @@
 //   0 : Disable (hide always)
 //   1 : Enable (show always)
 //   2 : Smart (show only when precipitation is forecasted)
-#define DISPLAY_DAILY_PRECIP 2
+#ifndef DISPLAY_DAILY_PRECIP
+  #define DISPLAY_DAILY_PRECIP 2
+#endif
 
 // HOURLY WEATHER ICONS
 // Weather icons to be displayed on the temperature and precipitation chart.
 // They are drawn at the the x-axis tick marks just above the temperature line
 //   0 : Disable
 //   1 : Enable
-#define DISPLAY_HOURLY_ICONS 1
+#ifndef DISPLAY_HOURLY_ICONS
+  #define DISPLAY_HOURLY_ICONS 1
+#endif
 
 // ALERTS
 //   The handling of alerts is complex. Each country has a unique national alert
@@ -246,29 +233,41 @@
 //   provides alerts in English only. Any combination of these factors may make
 //   it undesirable to display alerts in some regions.
 //   Disable alerts by changing the DISPLAY_ALERTS macro to 0.
-#define DISPLAY_ALERTS 1
+#ifndef DISPLAY_ALERTS
+  #define DISPLAY_ALERTS 1
+#endif
 
 // STATUS BAR EXTRAS
 //   Extra information that can be displayed on the status bar. Set to 1 to
 //   enable.
-#define STATUS_BAR_EXTRAS_BAT_VOLTAGE 0
-#define STATUS_BAR_EXTRAS_WIFI_RSSI   0
+#ifndef STATUS_BAR_EXTRAS_BAT_VOLTAGE
+  #define STATUS_BAR_EXTRAS_BAT_VOLTAGE 0
+#endif
+#ifndef STATUS_BAR_EXTRAS_WIFI_RSSI
+  #define STATUS_BAR_EXTRAS_WIFI_RSSI   0
+#endif
 
 // BATTERY MONITORING
 //   You may choose to power your weather display with or without a battery.
 //   Low power behavior can be controlled in config.cpp.
 //   If you wish to disable battery monitoring set this macro to 0.
-#define BATTERY_MONITORING 1
+#ifndef BATTERY_MONITORING
+  #define BATTERY_MONITORING 1
+#endif
 
 // NON-VOLATILE STORAGE (NVS) NAMESPACE
-#define NVS_NAMESPACE "weather_epd"
+#ifndef NVS_NAMESPACE
+  #define NVS_NAMESPACE "weather_epd"
+#endif
 
 // DEBUG
 //   If defined, enables increase verbosity over the serial port.
 //   level 0: basic status information, assists troubleshooting (default)
 //   level 1: increased verbosity for debugging
 //   level 2: print api responses to serial monitor
-#define DEBUG_LEVEL 0
+#ifndef DEBUG_LEVEL
+  #define DEBUG_LEVEL 0
+#endif
 
 // Set the below constants in "config.cpp"
 extern const uint8_t PIN_BAT_ADC;
@@ -316,91 +315,89 @@ extern const uint32_t MAX_BATTERY_VOLTAGE;
 extern const uint32_t MIN_BATTERY_VOLTAGE;
 
 // CONFIG VALIDATION - DO NOT MODIFY
-#if !(  defined(DISP_BW_V2)  \
-      ^ defined(DISP_3C_B)   \
-      ^ defined(DISP_7C_F)   \
-      ^ defined(DISP_BW_V1))
-  #error Invalid configuration. Exactly one display panel must be selected.
+#if !(  EPD_PANEL == DISP_BW_V2  \
+      ^ EPD_PANEL == DISP_3C_B   \
+      ^ EPD_PANEL == DISP_7C_F   \
+      ^ EPD_PANEL == DISP_BW_V1)
+  #error Invalid configuration. Illegal selction of display panel.
 #endif
-#if !(  defined(DRIVER_WAVESHARE) \
-      ^ defined(DRIVER_DESPI_C02))
-  #error Invalid configuration. Exactly one driver board must be selected.
+#if !(  EPD_DRIVER == DRIVER_WAVESHARE \
+      ^ EPD_DRIVER == DRIVER_DESPI_C02)
+  #error Invalid configuration. Illegal selction of driver board.
 #endif
-#if !(  defined(SENSOR_BME280) \
-      ^ defined(SENSOR_BME680))
+#if !(  SENSOR == BME280 \
+      ^ SENSOR == BME680)
   #error Invalid configuration. Exactly one sensor must be selected.
 #endif
 #if !(defined(LOCALE))
   #error Invalid configuration. Locale not selected.
 #endif
-#if !(  defined(UNITS_TEMP_KELVIN)      \
-      ^ defined(UNITS_TEMP_CELSIUS)     \
-      ^ defined(UNITS_TEMP_FAHRENHEIT))
-  #error Invalid configuration. Exactly one temperature unit must be selected.
+#if !(  UNITS_TEMP == KELVIN      \
+      ^ UNITS_TEMP == CELSIUS     \
+      ^ UNITS_TEMP == FAHRENHEIT)
+  #error Invalid configuration. Illegal selction of temperature unit.
 #endif
-#if !(  defined(UNITS_SPEED_METERSPERSECOND)   \
-      ^ defined(UNITS_SPEED_FEETPERSECOND)     \
-      ^ defined(UNITS_SPEED_KILOMETERSPERHOUR) \
-      ^ defined(UNITS_SPEED_MILESPERHOUR)      \
-      ^ defined(UNITS_SPEED_KNOTS)             \
-      ^ defined(UNITS_SPEED_BEAUFORT))
-  #error Invalid configuration. Exactly one wind speed unit must be selected.
+#if !(  UNITS_SPEED == METERSPERSECOND   \
+      ^ UNITS_SPEED == FEETPERSECOND     \
+      ^ UNITS_SPEED == KILOMETERSPERHOUR \
+      ^ UNITS_SPEED == MILESPERHOUR      \
+      ^ UNITS_SPEED == KNOTS             \
+      ^ UNITS_SPEED == BEAUFORT)
+  #error Invalid configuration. Illegal selction of wind speed unit.
 #endif
-#if !(  defined(UNITS_PRES_HECTOPASCALS)             \
-      ^ defined(UNITS_PRES_PASCALS)                  \
-      ^ defined(UNITS_PRES_MILLIMETERSOFMERCURY)     \
-      ^ defined(UNITS_PRES_INCHESOFMERCURY)          \
-      ^ defined(UNITS_PRES_MILLIBARS)                \
-      ^ defined(UNITS_PRES_ATMOSPHERES)              \
-      ^ defined(UNITS_PRES_GRAMSPERSQUARECENTIMETER) \
-      ^ defined(UNITS_PRES_POUNDSPERSQUAREINCH))
-  #error Invalid configuration. Exactly one pressure unit must be selected.
+#if !(  UNITS_PRES == HECTOPASCALS             \
+      ^ UNITS_PRES == PASCALS                  \
+      ^ UNITS_PRES == MILLIMETERSOFMERCURY     \
+      ^ UNITS_PRES == INCHESOFMERCURY          \
+      ^ UNITS_PRES == MILLIBARS                \
+      ^ UNITS_PRES == ATMOSPHERES              \
+      ^ UNITS_PRES == GRAMSPERSQUARECENTIMETER \
+      ^ UNITS_PRES == POUNDSPERSQUAREINCH)
+  #error Invalid configuration. Illegal selction of pressure unit.
 #endif
-#if !(  defined(UNITS_DIST_KILOMETERS) \
-      ^ defined(UNITS_DIST_MILES))
-  #error Invalid configuration. Exactly one distance unit must be selected.
+#if !(  UNITS_DIST == KILOMETERS \
+      ^ UNITS_DIST == MILES)
+  #error Invalid configuration. Illegal selction of distance unit.
 #endif
-#if !(  defined(UNITS_HOURLY_PRECIP_POP)         \
-      ^ defined(UNITS_HOURLY_PRECIP_MILLIMETERS) \
-      ^ defined(UNITS_HOURLY_PRECIP_CENTIMETERS) \
-      ^ defined(UNITS_HOURLY_PRECIP_INCHES))
-  #error Invalid configuration. Exactly one houly precipitation measurement must be selected.
+#if !(  UNITS_HOURLY_PRECIP == POP         \
+      ^ UNITS_HOURLY_PRECIP == MILLIMETERS \
+      ^ UNITS_HOURLY_PRECIP == CENTIMETERS \
+      ^ UNITS_HOURLY_PRECIP == INCHES)
+  #error Invalid configuration. Illegal selction of houly precipitation measurement.
 #endif
-#if !(  defined(UNITS_DAILY_PRECIP_POP)         \
-      ^ defined(UNITS_DAILY_PRECIP_MILLIMETERS) \
-      ^ defined(UNITS_DAILY_PRECIP_CENTIMETERS) \
-      ^ defined(UNITS_DAILY_PRECIP_INCHES))
-  #error Invalid configuration. Exactly one daily precipitation measurement must be selected.
+#if !(  UNITS_DAILY_PRECIP == POP         \
+      ^ UNITS_DAILY_PRECIP == MILLIMETERS \
+      ^ UNITS_DAILY_PRECIP == CENTIMETERS \
+      ^ UNITS_DAILY_PRECIP == INCHES)
+  #error Invalid configuration. Illegal selction of daily precipitation measurement.
 #endif
-#if !(  defined(USE_HTTP)                   \
-      ^ defined(USE_HTTPS_NO_CERT_VERIF)    \
-      ^ defined(USE_HTTPS_WITH_CERT_VERIF))
-  #error Invalid configuration. Exactly one HTTP mode must be selected.
+#if !(  HTTP_MODE == HTTP                   \
+      ^ HTTP_MODE == HTTPS_NO_CERT_VERIF    \
+      ^ HTTP_MODE == HTTPS_WITH_CERT_VERIF)
+  #error Invalid configuration. Illegal selction of HTTP mode.
 #endif
-#if !(  defined(WIND_INDICATOR_ARROW)                         \
-      || (                                                    \
-          defined(WIND_INDICATOR_NUMBER)                      \
-        ^ defined(WIND_INDICATOR_CPN_CARDINAL)                \
-        ^ defined(WIND_INDICATOR_CPN_INTERCARDINAL)           \
-        ^ defined(WIND_INDICATOR_CPN_SECONDARY_INTERCARDINAL) \
-        ^ defined(WIND_INDICATOR_CPN_TERTIARY_INTERCARDINAL)  \
-      )                                                       \
-      ^ defined(WIND_INDICATOR_NONE))
+#if !(  WIND_DIRECTION_LABEL == NUMBER                  \
+      ^ WIND_DIRECTION_LABEL == CARDINAL                \
+      ^ WIND_DIRECTION_LABEL == INTERCARDINAL           \
+      ^ WIND_DIRECTION_LABEL == SECONDARY_INTERCARDINAL \
+      ^ WIND_DIRECTION_LABEL == TERTIARY_INTERCARDINAL  \
+      ^ WIND_DIRECTION_LABEL == 0)
   #error Invalid configuration. Illegal selction of wind indicator(s).
 #endif
-#if defined(WIND_INDICATOR_ARROW)                   \
- && !(  defined(WIND_ICONS_CARDINAL)                \
-      ^ defined(WIND_ICONS_INTERCARDINAL)           \
-      ^ defined(WIND_ICONS_SECONDARY_INTERCARDINAL) \
-      ^ defined(WIND_ICONS_TERTIARY_INTERCARDINAL)  \
-      ^ defined(WIND_ICONS_360))
-  #error Invalid configuration. Exactly one wind direction icon precision level must be selected.
+#if !(  ARROW_PRECISION == CARDINAL                \
+      ^ ARROW_PRECISION == INTERCARDINAL           \
+      ^ ARROW_PRECISION == SECONDARY_INTERCARDINAL \
+      ^ ARROW_PRECISION == TERTIARY_INTERCARDINAL  \
+      ^ ARROW_PRECISION == ANY_360  \
+      ^ ARROW_PRECISION == 0)
+  #error Invalid configuration. Illegal selction of wind direction icon precision level.
 #endif
 #if !(defined(FONT_HEADER))
   #error Invalid configuration. Font not selected.
 #endif
-#if !(defined(DISPLAY_DAILY_PRECIP))
-  #error Invalid configuration. DISPLAY_DAILY_PRECIP not defined.
+#if !(  DISPLAY_DAILY_PRECIP >= 0 \
+     && DISPLAY_DAILY_PRECIP <= 2)
+  #error Invalid configuration. Illegal selction of daily precipitation.
 #endif
 #if !(defined(DISPLAY_HOURLY_ICONS))
   #error Invalid configuration. DISPLAY_HOURLY_ICONS not defined.
@@ -411,8 +408,9 @@ extern const uint32_t MIN_BATTERY_VOLTAGE;
 #if !(defined(BATTERY_MONITORING))
   #error Invalid configuration. BATTERY_MONITORING not defined.
 #endif
-#if !(defined(DEBUG_LEVEL))
-  #error Invalid configuration. DEBUG_LEVEL not defined.
+#if !(  DEBUG_LEVEL >= 0 \
+     && DEBUG_LEVEL <= 2)
+  #error Invalid configuration. Illegal selction of DEBUG_LEVEL.
 #endif
 
 #endif
