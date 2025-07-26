@@ -141,7 +141,7 @@ const uint8_t *getBatBitmap24(uint32_t batPercent)
 void getDateStr(String &s, tm *timeInfo)
 {
   char buf[48] = {};
-  _strftime(buf, sizeof(buf), DATE_FORMAT, timeInfo);
+  _strftime(buf, sizeof(buf), D_DATE_FORMAT, timeInfo);
   s = buf;
 
   // remove double spaces. %e will add an extra space, ie. " 1" instead of "1"
@@ -160,7 +160,7 @@ void getRefreshTimeStr(String &s, bool timeSuccess, tm *timeInfo)
   }
 
   char buf[48] = {};
-  _strftime(buf, sizeof(buf), REFRESH_TIME_FORMAT, timeInfo);
+  _strftime(buf, sizeof(buf), D_REFRESH_TIME_FORMAT, timeInfo);
   s = buf;
 
   // remove double spaces.
@@ -883,13 +883,13 @@ enum alert_category getAlertCategory(const owm_alerts_t &alert)
   return alert_category::NOT_FOUND;
 } // end getAlertCategory
 
-#if ARROW_PRECISION == CARDINAL
+#if WIND_ARROW_PRECISION == CARDINAL
 static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_0deg_24x24,    // N
   wind_direction_meteorological_90deg_24x24,   // E
   wind_direction_meteorological_180deg_24x24,  // S
   wind_direction_meteorological_270deg_24x24}; // W
-#elif ARROW_PRECISION == INTERCARDINAL
+#elif WIND_ARROW_PRECISION == INTERCARDINAL
 static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_0deg_24x24,    // N
   wind_direction_meteorological_45deg_24x24,   // NE
@@ -899,7 +899,7 @@ static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_225deg_24x24,  // SW
   wind_direction_meteorological_270deg_24x24,  // W
   wind_direction_meteorological_315deg_24x24}; // NW
-#elif ARROW_PRECISION == SECONDARY_INTERCARDINAL
+#elif WIND_ARROW_PRECISION == SECONDARY_INTERCARDINAL
 static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_0deg_24x24,      // N
   wind_direction_meteorological_22_5deg_24x24,   // NNE
@@ -917,7 +917,7 @@ static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_292_5deg_24x24,  // WNW
   wind_direction_meteorological_315deg_24x24,    // NW
   wind_direction_meteorological_337_5deg_24x24}; // NNW
-#elif ARROW_PRECISION == TERTIARY_INTERCARDINAL
+#elif WIND_ARROW_PRECISION == TERTIARY_INTERCARDINAL
 static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_0deg_24x24,       // N
   wind_direction_meteorological_11_25deg_24x24,   // NbE
@@ -951,7 +951,7 @@ static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_326_25deg_24x24,  // NWbN
   wind_direction_meteorological_337_5deg_24x24,   // NNW
   wind_direction_meteorological_348_75deg_24x24}; // NbW
-#elif ARROW_PRECISION == ANY_360
+#elif WIND_ARROW_PRECISION == ANY_360
 static const unsigned char *wind_direction_icon_arr[] = {
   wind_direction_meteorological_0deg_24x24,
   wind_direction_meteorological_1deg_24x24,

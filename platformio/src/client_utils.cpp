@@ -59,7 +59,7 @@ wl_status_t startWiFi(int &wifiRSSI)
 {
   WiFi.mode(WIFI_STA);
   Serial.printf("%s '%s'", TXT_CONNECTING_TO, WIFI_SSID);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.begin(WIFI_SSID, D_WIFI_PASSWORD);
 
   // timeout if WiFi does not connect in WIFI_TIMEOUT ms from now
   unsigned long timeout = millis() + WIFI_TIMEOUT;

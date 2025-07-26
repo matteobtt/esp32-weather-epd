@@ -226,9 +226,9 @@ void initDisplay()
 {
   pinMode(PIN_EPD_PWR, OUTPUT);
   digitalWrite(PIN_EPD_PWR, HIGH);
-#if EPD_DRIVER == DRIVER_WAVESHARE
+#if EPD_DRIVER == WAVESHARE
   display.init(115200, true, 2, false);
-#elif EPD_DRIVER == DRIVER_DESPI_C02
+#elif EPD_DRIVER == DESPI_C02
   display.init(115200, true, 10, false);
 #endif
   // remap spi
@@ -381,7 +381,7 @@ void drawCurrentConditions(const owm_current_t &current,
   drawString(48, 204 + 17 / 2 + (48 + 8) * 0 + 48 / 2, timeBuffer, LEFT);
 
   // wind
-#if ARROW_PRECISION
+#if WIND_ARROW_PRECISION
   display.drawInvertedBitmap(48, 204 + 24 / 2 + (48 + 8) * 1,
                              getWindBitmap24(current.wind_deg),
                              24, 24, GxEPD_BLACK);
@@ -410,7 +410,7 @@ void drawCurrentConditions(const owm_current_t &current,
   unitStr = String(" ") + TXT_UNITS_SPEED_BEAUFORT;
 #endif
 
-#if ARROW_PRECISION
+#if WIND_ARROW_PRECISION
   drawString(48 + 24, 204 + 17 / 2 + (48 + 8) * 1 + 48 / 2, dataStr, LEFT);
 #else
   drawString(48     , 204 + 17 / 2 + (48 + 8) * 1 + 48 / 2, dataStr, LEFT);
@@ -594,10 +594,10 @@ void drawCurrentConditions(const owm_current_t &current,
 #if EPD_PANEL != DISP_BW_V1
   // visibility
   display.setFont(&FONT_12pt8b);
-#if UNITS_DIST == KILOMETERS
+#if UNITS_DISTANCE == KILOMETERS
   float vis = meters_to_kilometers(current.visibility);
   unitStr = String(" ") + TXT_UNITS_DIST_KILOMETERS;
-#elif UNITS_DIST == MILES
+#elif UNITS_DISTANCE == MILES
   float vis = meters_to_miles(current.visibility);
   unitStr = String(" ") + TXT_UNITS_DIST_MILES;
 #endif
@@ -719,14 +719,14 @@ void drawForecast(const owm_daily_t *daily, tm timeInfo)
     unitStr = String(" ") + TXT_UNITS_PRECIP_INCHES;
 #endif
 #endif
-#if (DISPLAY_DAILY_PRECIP == 2) // smart
+#if (DISPLAY_DAILY_PRECIP == PRECIP_SMART) // smart
       if (dailyPrecip > 0.0f)
       {
 #endif
         display.setFont(&FONT_6pt8b);
         drawString(x + 31, 98 + 69 / 2 + 38 - 6 + 26,
                    dataStr + unitStr, CENTER);
-#if (DISPLAY_DAILY_PRECIP == 2) // smart
+#if (DISPLAY_DAILY_PRECIP == PRECIP_SMART) // smart
       }
 #endif
 #endif // DISPLAY_DAILY_PRECIP

@@ -233,7 +233,7 @@ void setup()
   }
 
   // TIME SYNCHRONIZATION
-  configTzTime(TIMEZONE, NTP_SERVER_1, NTP_SERVER_2);
+  configTzTime(D_TIMEZONE, NTP_SERVER_1, NTP_SERVER_2);
   bool timeConfigured = waitForSNTPSync(&timeInfo);
   if (!timeConfigured)
   {
