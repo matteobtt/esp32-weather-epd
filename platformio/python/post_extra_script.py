@@ -56,6 +56,10 @@ with open("./config.json", "r", encoding="utf-8") as config_file:
                 cppDefines[upper_snake(k)] = v.name
         elif type(v) == str:
             cppDefines["D_" + upper_snake(k)] = env.StringifyMacro(v)
+        elif v is None:
+            cppDefines["D_" + upper_snake(k)] = env.StringifyMacro("")
+        elif type(v) == bool:
+            cppDefines[upper_snake(k)] = int(v)
         else:
             cppDefines[upper_snake(k)] = v
 

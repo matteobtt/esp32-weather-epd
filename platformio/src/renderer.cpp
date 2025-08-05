@@ -549,10 +549,10 @@ void drawCurrentConditions(const owm_current_t &current,
              "%", LEFT);
 
   // pressure
-#if UNITS_PRES == HECTOPASCALS
+#if UNITS_PRES == HECTOPASCAL
   dataStr = String(current.pressure);
   unitStr = String(" ") + TXT_UNITS_PRES_HECTOPASCALS;
-#elif UNITS_PRES == PASCALS
+#elif UNITS_PRES == PASCAL
   dataStr = String(static_cast<int>(std::round(
                    hectopascals_to_pascals(current.pressure) )));
   unitStr = String(" ") + TXT_UNITS_PRES_PASCALS;
@@ -565,11 +565,11 @@ void drawCurrentConditions(const owm_current_t &current,
                    hectopascals_to_inchesofmercury(current.pressure)
                    ) / 1e1f, 1);
   unitStr = String(" ") + TXT_UNITS_PRES_INCHESOFMERCURY;
-#elif UNITS_PRES == MILLIBARS
+#elif UNITS_PRES == MILLIBAR
   dataStr = String(static_cast<int>(std::round(
                    hectopascals_to_millibars(current.pressure) )));
   unitStr = String(" ") + TXT_UNITS_PRES_MILLIBARS;
-#elif UNITS_PRES == ATMOSPHERES
+#elif UNITS_PRES == ATMOSPHERE
   dataStr = String(std::round(1e3f *
                    hectopascals_to_atmospheres(current.pressure) )
                    / 1e3f, 3);

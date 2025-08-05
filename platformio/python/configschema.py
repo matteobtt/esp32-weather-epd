@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Annotated
-from pydantic import BaseModel, Field, WithJsonSchema, field_validator, ValidationInfo
+from pydantic import BaseModel, Field, WithJsonSchema, field_validator
 
 class DocEnum(Enum):
     def __new__(cls, value, doc=None):
@@ -44,11 +44,11 @@ class UnitsSpeed(str, Enum):
     KNOTS = "kt"
     BEAUFORT = "Beaufort"
 
-class UnitsPressure(str, Enum):
+class UnitsPres(str, Enum):
     """Atmospheric pressure units"""
     HECTOPASCAL = "hPa"
     PASCAL = "Pa"
-    MILLIMETRSEOFMERCURY = "mmHg"
+    MILLIMETERSOFMERCURY = "mmHg"
     INCHESOFMERCURY = "inHg"
     MILLIBAR = "mbar"
     ATMOSPHERE = "atm"
@@ -73,14 +73,14 @@ class WindDirectionLabel(str, Enum):
     CARDINAL = "cardinal"
     INTERCARDINAL = "intercardinal"
     SECONDARY_INTERCARDINAL = "secondary intercardinal"
-    TERTIARYINTERCARDINAL = "tertiary intercardinal"
+    TERTIARY_INTERCARDINAL = "tertiary intercardinal"
 
 class WindArrowPrecision(str, Enum):
     WIND_HIDDEN = "hidden"
     CARDINAL = "cardinal"
     INTERCARDINAL = "intercardinal"
     SECONDARY_INTERCARDINAL = "secondary intercardinal"
-    TERTIARYINTERCARDINAL = "tertiary intercardinal"
+    TERTIARY_INTERCARDINAL = "tertiary intercardinal"
     ANY_360 = "360 deg"
 
 class DisplayDailyPrecip(str, Enum):
@@ -123,7 +123,7 @@ defined_enums: list[Enum] = [
     Sensor,
     UnitsTemp,
     UnitsSpeed,
-    UnitsPressure,
+    UnitsPres,
     UnitsDistance,
     UnitsPrecip,
     WindDirectionLabel,
@@ -150,7 +150,7 @@ class ConfigSchema(BaseModel):
     useImperialUnitsAsDefault: bool = False # TODO: Use locale to set units
     unitsTemp: UnitsTemp = Field(default_factory=lambda data: UnitsTemp.FAHRENHEIT if data['useImperialUnitsAsDefault'] else UnitsTemp.CELSIUS)
     unitsSpeed: UnitsSpeed = Field(default_factory=lambda data: UnitsSpeed.MILESPERHOUR if data['useImperialUnitsAsDefault'] else UnitsSpeed.KILOMETERSPERHOUR)
-    unitsPressure: UnitsPressure = Field(default_factory=lambda data: UnitsPressure.INCHESOFMERCURY if data['useImperialUnitsAsDefault'] else UnitsPressure.MILLIBAR)
+    unitsPres: UnitsPres = Field(default_factory=lambda data: UnitsPres.INCHESOFMERCURY if data['useImperialUnitsAsDefault'] else UnitsPres.MILLIBAR)
     unitsDistance: UnitsDistance = Field(default_factory=lambda data: UnitsDistance.MILES if data['useImperialUnitsAsDefault'] else UnitsDistance.KILOMETERS)
     unitsHourlyPrecip: UnitsPrecip = UnitsPrecip.POP
     unitsDailyPrecip: UnitsPrecip = Field(default_factory=lambda data: UnitsPrecip.INCHES if data['useImperialUnitsAsDefault'] else UnitsPrecip.MILLIMETERS)
@@ -160,8 +160,8 @@ class ConfigSchema(BaseModel):
     displayDailyPrecip: DisplayDailyPrecip = DisplayDailyPrecip.PRECIP_SMART
     displayHourlyIcons: bool = True
     displayAlerts: bool = True
-    displayBatteryVoltage: bool = True
-    displayWifiRSSI: bool = True
+    statusBarExtrasBatVoltage: bool = False
+    statusBarExtrasWifiRSSI: bool = False
     batteryMonitoring: bool = True
     debugLevel: int = 0 # TODO: From 0 to 2
     pinBatAdc: int = 34 # TODO: Manage An nomenclature for analog pins
@@ -197,7 +197,7 @@ class ConfigSchema(BaseModel):
 
     @field_validator('bmeAddress')
     @classmethod
-    def validate_int(cls, v: int | str, info: ValidationInfo):
+    def validate_int(cls, v: int | str):
         return int(v, 0) if isinstance(v, str) else v
 
 # TODO: JSON Schema
