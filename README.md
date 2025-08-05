@@ -1,3 +1,8 @@
+## Changes made to this fork
+- Configuration moved to a non-versioned JSON file which is processed by a Python script to generate C++ defines.
+
+---
+
 # ESP32 E-Paper Weather Display
 
 A low-power weather display using a wifi-enabled ESP32 microcontroller and a 7.5" E-Paper display. Weather data is fetched from the OpenWeatherMap API, and an onboard sensor provides indoor temperature and humidity.
