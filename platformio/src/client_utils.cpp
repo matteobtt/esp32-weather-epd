@@ -39,11 +39,11 @@
 #include "config.h"
 #include "display_utils.h"
 #include "renderer.h"
-#ifndef USE_HTTP
+#if HTTP_MODE == HTTP
   #include <WiFiClientSecure.h>
 #endif
 
-#ifdef USE_HTTP
+#if HTTP_MODE == HTTP
   static const uint16_t OWM_PORT = 80;
 #else
   static const uint16_t OWM_PORT = 443;
@@ -59,7 +59,7 @@ wl_status_t startWiFi(int &wifiRSSI)
 {
   WiFi.mode(WIFI_STA);
   Serial.printf("%s '%s'", TXT_CONNECTING_TO, WIFI_SSID);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.begin(WIFI_SSID, D_WIFI_PASSWORD);
 
   // timeout if WiFi does not connect in WIFI_TIMEOUT ms from now
   unsigned long timeout = millis() + WIFI_TIMEOUT;
@@ -143,7 +143,7 @@ bool waitForSNTPSync(tm *timeInfo)
  *
  * Returns the HTTP Status Code.
  */
-#ifdef USE_HTTP
+#if HTTP_MODE == HTTP
   int getOWMonecall(WiFiClient &client, owm_resp_onecall_t &r)
 #else
   int getOWMonecall(WiFiClientSecure &client, owm_resp_onecall_t &r)
@@ -209,7 +209,7 @@ bool waitForSNTPSync(tm *timeInfo)
  *
  * Returns the HTTP Status Code.
  */
-#ifdef USE_HTTP
+#if HTTP_MODE == HTTP
   int getOWMairpollution(WiFiClient &client, owm_resp_air_pollution_t &r)
 #else
   int getOWMairpollution(WiFiClientSecure &client, owm_resp_air_pollution_t &r)

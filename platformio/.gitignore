@@ -1,2 +1,4 @@
 .pio
 .vscode
+/python/__pycache__
+/config.json
