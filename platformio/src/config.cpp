@@ -23,7 +23,7 @@ const char *WIFI_SSID     = D_WIFI_SSID;
 const unsigned long WIFI_TIMEOUT = 10000; // ms, WiFi connection timeout.
 
 // HTTP
-// The following errors are likely the result of insuffient http client tcp 
+// The following errors are likely the result of insuffient http client tcp
 // timeout:
 //   -1   Connection Refused
 //   -11  Read Timeout
@@ -33,7 +33,6 @@ const unsigned HTTP_CLIENT_TCP_TIMEOUT = 10000; // ms
 // OPENWEATHERMAP API
 // OpenWeatherMap API key, https://openweathermap.org/
 const String OWM_APIKEY = D_OWM_APIKEY;
-const String OWM_ENDPOINT = "api.openweathermap.org";
 // OpenWeatherMap One Call 2.5 API is deprecated for all new free users
 // (accounts created after Summer 2022).
 //
@@ -49,6 +48,14 @@ const String OWM_ENDPOINT = "api.openweathermap.org";
 //   day (no more than)" to 1,000. This ensures you will never overrun the free
 //   calls.
 const String OWM_ONECALL_VERSION = D_OWM_ONECALL_VERSION;
+
+// OPENWEATHERMAP API
+// OpenWeatherMap API key, https://openweathermap.org/
+const String OWM_ENDPOINT = "api.openweathermap.org";
+
+// OPENMETEO API
+// Open Meteo API, https://open-meteo.com/
+const String OM_ENDPOINT = "api.open-meteo.com";
 
 // LOCATION
 // Set your latitude and longitude.
@@ -84,11 +91,11 @@ const unsigned long NTP_TIMEOUT = 20000; // ms
 // minutes). Once the battery voltage has fallen to CRIT_LOW_BATTERY_VOLTAGE,
 // the esp32 will hibernate and a manual press of the reset (RST) button to
 // begin operating again.
-const uint32_t WARN_BATTERY_VOLTAGE     = 3535; // (millivolts) ~20%
-const uint32_t LOW_BATTERY_VOLTAGE      = 3462; // (millivolts) ~10%
-const uint32_t VERY_LOW_BATTERY_VOLTAGE = 3442; // (millivolts)  ~8%
-const uint32_t CRIT_LOW_BATTERY_VOLTAGE = 3404; // (millivolts)  ~5%
-const unsigned long LOW_BATTERY_SLEEP_INTERVAL      = 30;  // (minutes)
+const uint32_t WARN_BATTERY_VOLTAGE = 3535;                // (millivolts) ~20%
+const uint32_t LOW_BATTERY_VOLTAGE = 3462;                 // (millivolts) ~10%
+const uint32_t VERY_LOW_BATTERY_VOLTAGE = 3442;            // (millivolts)  ~8%
+const uint32_t CRIT_LOW_BATTERY_VOLTAGE = 3404;            // (millivolts)  ~5%
+const unsigned long LOW_BATTERY_SLEEP_INTERVAL = 30;       // (minutes)
 const unsigned long VERY_LOW_BATTERY_SLEEP_INTERVAL = 120; // (minutes)
 // Battery voltage calculations are based on a typical 3.7v LiPo.
 const uint32_t MAX_BATTERY_VOLTAGE = 4200; // (millivolts)
@@ -102,4 +109,3 @@ const uint32_t MIN_BATTERY_VOLTAGE = 3000; // (millivolts)
 // FONTS
 // ALERTS
 // BATTERY MONITORING
-

@@ -94,20 +94,16 @@ def get_certificate(hostname, port, name):
 
 def main():
     parser = argparse.ArgumentParser(description='download certificate chain and public keys under a C++/Arduino compilable form')
-    parser.add_argument('-s', '--server', action='store', required=True, help='TLS server dns name')
+    parser.add_argument('-s', '--servers', action='store', required=True, help='list of TLS server dns names separated by comma')
     parser.add_argument('-p', '--port', action='store', required=False, help='TLS server port')
     parser.add_argument('-n', '--name', action='store', required=False, help='variable name')
-    port = 443
     args = parser.parse_args()
-    server = args.server
+    servers = []
     try:
-        split = server.split(':')
-        server = split[0]
-        port = int(split[1])
-    except:
-        pass
-    try:
-        port = int(args.port)
+        for s in args.servers.split(','):
+            split = s.split(':')
+            port = int(split[1] if len(split) == 2 else args.port or 443)
+            servers.append({'hostname': split[0], 'port': port})
     except:
         pass
 
@@ -122,7 +118,8 @@ def main():
     print('#ifndef __CERT_H__')
     print('#define __CERT_H__')
     print()
-    get_certificate(server, port, args.name)
+    for s in servers:
+        get_certificate(s['hostname'], s['port'], args.name)
     print('#endif')
     print()
     return

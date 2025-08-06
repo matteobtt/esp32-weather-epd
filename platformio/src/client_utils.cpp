@@ -46,7 +46,7 @@
 #if HTTP_MODE == HTTP
   static const uint16_t OWM_PORT = 80;
 #else
-  static const uint16_t OWM_PORT = 443;
+  static const uint16_t PORT = 443;
 #endif
 
 /* Power-on and connect WiFi.
@@ -121,13 +121,11 @@ bool waitForSNTPSync(tm *timeInfo)
 {
   // Wait for SNTP synchronization to complete
   unsigned long timeout = millis() + NTP_TIMEOUT;
-  if ((sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET)
-      && (millis() < timeout))
+  if ((sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET) && (millis() < timeout))
   {
     Serial.print(TXT_WAITING_FOR_SNTP);
     delay(100); // ms
-    while ((sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET)
-        && (millis() < timeout))
+    while ((sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET) && (millis() < timeout))
     {
       Serial.print(".");
       delay(100); // ms
@@ -152,9 +150,7 @@ bool waitForSNTPSync(tm *timeInfo)
   int attempts = 0;
   bool rxSuccess = false;
   DeserializationError jsonErr = {};
-  String uri = "/data/" + OWM_ONECALL_VERSION
-               + "/onecall?lat=" + LAT + "&lon=" + LON + "&lang=" + OWM_LANG
-               + "&units=standard&exclude=minutely";
+  String uri = "/data/" + OWM_ONECALL_VERSION + "/onecall?lat=" + LAT + "&lon=" + LON + "&lang=" + OWM_LANG + "&units=metric&exclude=minutely";
 #if !DISPLAY_ALERTS
   // exclude alerts
   uri += ",alerts";
@@ -180,8 +176,8 @@ bool waitForSNTPSync(tm *timeInfo)
 
     HTTPClient http;
     http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
-    http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
-    http.begin(client, OWM_ENDPOINT, OWM_PORT, uri);
+    http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
+    http.begin(client, OWM_ENDPOINT, PORT, uri);
     httpResponse = http.GET();
     if (httpResponse == HTTP_CODE_OK)
     {
@@ -195,8 +191,7 @@ bool waitForSNTPSync(tm *timeInfo)
     }
     client.stop();
     http.end();
-    Serial.println("  " + String(httpResponse, DEC) + " "
-                   + getHttpResponsePhrase(httpResponse));
+    Serial.println("  " + String(httpResponse, DEC) + " " + getHttpResponsePhrase(httpResponse));
     ++attempts;
   }
 
@@ -229,15 +224,11 @@ bool waitForSNTPSync(tm *timeInfo)
   char startStr[22];
   sprintf(endStr, "%lld", end);
   sprintf(startStr, "%lld", start);
-  String uri = "/data/2.5/air_pollution/history?lat=" + LAT + "&lon=" + LON
-               + "&start=" + startStr + "&end=" + endStr
-               + "&appid=" + OWM_APIKEY;
+  String uri = "/data/2.5/air_pollution/history?lat=" + LAT + "&lon=" + LON + "&start=" + startStr + "&end=" + endStr + "&appid=" + OWM_APIKEY;
   // This string is printed to terminal to help with debugging. The API key is
   // censored to reduce the risk of users exposing their key.
   String sanitizedUri = OWM_ENDPOINT +
-               "/data/2.5/air_pollution/history?lat=" + LAT + "&lon=" + LON
-               + "&start=" + startStr + "&end=" + endStr
-               + "&appid={API key}";
+                        "/data/2.5/air_pollution/history?lat=" + LAT + "&lon=" + LON + "&start=" + startStr + "&end=" + endStr + "&appid={API key}";
 
   Serial.print(TXT_ATTEMPTING_HTTP_REQ);
   Serial.println(": " + sanitizedUri);
@@ -253,8 +244,8 @@ bool waitForSNTPSync(tm *timeInfo)
 
     HTTPClient http;
     http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
-    http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
-    http.begin(client, OWM_ENDPOINT, OWM_PORT, uri);
+    http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
+    http.begin(client, OWM_ENDPOINT, PORT, uri);
     httpResponse = http.GET();
     if (httpResponse == HTTP_CODE_OK)
     {
@@ -268,25 +259,87 @@ bool waitForSNTPSync(tm *timeInfo)
     }
     client.stop();
     http.end();
-    Serial.println("  " + String(httpResponse, DEC) + " "
-                   + getHttpResponsePhrase(httpResponse));
+    Serial.println("  " + String(httpResponse, DEC) + " " + getHttpResponsePhrase(httpResponse));
     ++attempts;
   }
 
   return httpResponse;
 } // getOWMairpollution
 
+/* Perform an HTTP GET request to OpenMeteo's API
+ * If data is received, it will be parsed and stored in the global variable
+ * om_call.
+ *
+ * Returns the HTTP Status Code.
+ */
+#ifdef USE_HTTP
+int getOMCall(WiFiClient &client, owm_resp_onecall_t &r)
+#else
+int getOMCall(WiFiClientSecure &client, owm_resp_onecall_t &r)
+#endif
+{
+  int attempts = 0;
+  bool rxSuccess = false;
+  DeserializationError jsonErr = {};
+
+  String uri = "/v1/forecast?latitude=" + LAT + "&longitude=" + LON + "&" +
+               "current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,cloud_cover,visibility,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,is_day&" +
+               "hourly=temperature_2m,cloud_cover,wind_speed_10m,wind_gusts_10m,precipitation_probability,rain,snowfall,weather_code,is_day&" +
+               "daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,rain_sum,snowfall_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max&" +
+               "wind_speed_unit=ms&timezone=auto&timeformat=unixtime&forecast_days=5&forecast_hours=" + HOURLY_GRAPH_MAX;
+
+#if !DISPLAY_ALERTS
+  // exclude alerts
+  // uri += ",alerts";
+#endif
+
+  // This string is printed to terminal to help with debugging.
+  String sanitizedUri = OM_ENDPOINT + uri;
+
+  Serial.print(TXT_ATTEMPTING_HTTP_REQ);
+  Serial.println(": " + sanitizedUri);
+  int httpResponse = 0;
+  while (!rxSuccess && attempts < 3)
+  {
+    wl_status_t connection_status = WiFi.status();
+    if (connection_status != WL_CONNECTED)
+    {
+      // -512 offset distinguishes these errors from httpClient errors
+      return -512 - static_cast<int>(connection_status);
+    }
+
+    HTTPClient http;
+    http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
+    http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
+    http.useHTTP10(true);
+    http.begin(client, OM_ENDPOINT, PORT, uri);
+    httpResponse = http.GET();
+    if (httpResponse == HTTP_CODE_OK)
+    {
+      jsonErr = deserializeOpenMeteoCall(http.getStream(), r); // Convert String to const char*
+      if (jsonErr)
+      {
+        // -256 offset distinguishes these errors from httpClient errors
+        httpResponse = -256 - static_cast<int>(jsonErr.code());
+      }
+      rxSuccess = !jsonErr;
+    }
+    client.stop();
+    http.end();
+    Serial.println("  " + String(httpResponse, DEC) + " " + getHttpResponsePhrase(httpResponse));
+    ++attempts;
+  }
+
+  return httpResponse;
+} // getOMcall
+
 /* Prints debug information about heap usage.
  */
-void printHeapUsage() {
-  Serial.println("[debug] Heap Size       : "
-                 + String(ESP.getHeapSize()) + " B");
-  Serial.println("[debug] Available Heap  : "
-                 + String(ESP.getFreeHeap()) + " B");
-  Serial.println("[debug] Min Free Heap   : "
-                 + String(ESP.getMinFreeHeap()) + " B");
-  Serial.println("[debug] Max Allocatable : "
-                 + String(ESP.getMaxAllocHeap()) + " B");
+void printHeapUsage()
+{
+  Serial.println("[debug] Heap Size       : " + String(ESP.getHeapSize()) + " B");
+  Serial.println("[debug] Available Heap  : " + String(ESP.getFreeHeap()) + " B");
+  Serial.println("[debug] Min Free Heap   : " + String(ESP.getMinFreeHeap()) + " B");
+  Serial.println("[debug] Max Allocatable : " + String(ESP.getMaxAllocHeap()) + " B");
   return;
 }
-

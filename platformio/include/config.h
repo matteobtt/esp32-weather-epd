@@ -21,6 +21,9 @@
 #include <cstdint>
 #include <Arduino.h>
 
+#define INDOOR 0
+#define AIR_POLLUTION 0
+
 // DEFAULT CONFIGS
 
 #define HTTP 0
@@ -60,6 +63,7 @@ extern const unsigned HTTP_CLIENT_TCP_TIMEOUT;
 extern const String OWM_APIKEY;
 extern const String OWM_ENDPOINT;
 extern const String OWM_ONECALL_VERSION;
+extern const String OM_ENDPOINT;
 extern const String LAT;
 extern const String LON;
 extern const String CITY_STRING;
