@@ -175,29 +175,23 @@ PlatformIO for VSCode is used for managing dependencies, code compilation, and u
 
 5. Configure Options.
 
-   - Most configuration options are located in [config.cpp](platformio/src/config.cpp), with a few  in [config.h](platformio/include/config.h) and [credentials.h](platformio/include/credentials.h).
+   - The configuration options and their defaults are listed in [configschema.py](platformio/python/configschema.py), to modify them edit the [config.json](platformio/config.json) file.
 
-   - First copy `platformio/include/credentials.h.template` to `platformio/include/credentials.h`
-
-   - Important settings to configure in credentials.h:
+   - Important settings to configure in config.json:
 
      - WiFi credentials (ssid, password).
 
-     - Open Weather Map API key (it's free, see next section for important notes about obtaining an API key).
+     - Open Weather Map API key (only for Open Weather Map, it's free, see next section for important notes about obtaining an API key).
 
      - Latitude and longitude.
-
-   - Important settings to configure in config.cpp:
 
      - Time and date formats.
 
      - Sleep duration.
 
-   - Important settings to configure in config.h:
-
      - Units (Metric or Imperial).
 
-   - Comments explain each option in detail.
+   - (TODO - Comments explain each option in detail).
 
 6. Build and Upload Code.
 

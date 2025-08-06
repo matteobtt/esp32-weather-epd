@@ -272,7 +272,7 @@ bool waitForSNTPSync(tm *timeInfo)
  *
  * Returns the HTTP Status Code.
  */
-#ifdef USE_HTTP
+#if HTTP_MODE == HTTP
 int getOMCall(WiFiClient &client, owm_resp_onecall_t &r)
 #else
 int getOMCall(WiFiClientSecure &client, owm_resp_onecall_t &r)

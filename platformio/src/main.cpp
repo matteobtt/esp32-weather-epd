@@ -250,13 +250,13 @@ void setup()
   client.setInsecure();
 #elif HTTP_MODE == HTTPS_WITH_CERT_VERIF
   WiFiClientSecure client;
-#if defined(USE_OPEN_WEATHER_MAP)
+#if WEATHER_API == OPEN_WEATHER_MAP
   client.setCACert(cert_Sectigo_RSA_Organization_Validation_Secure_Server_CA);
-#elif defined(USE_OPEN_METEO)
+#elif WEATHER_API == OPEN_METEO
   client.setCACert(cert_R11);
 #endif
 #endif
-#if defined(USE_OPEN_WEATHER_MAP)
+#if WEATHER_API == OPEN_WEATHER_MAP
   int rxStatus = getOWMonecall(client, owm_onecall);
   if (rxStatus != HTTP_CODE_OK)
   {
@@ -272,7 +272,6 @@ void setup()
     beginDeepSleep(startTime, &timeInfo);
   }
 
-#if AIR_POLLUTION
   rxStatus = getOWMairpollution(client, owm_air_pollution);
   if (rxStatus != HTTP_CODE_OK)
   {
@@ -287,9 +286,8 @@ void setup()
     powerOffDisplay();
     beginDeepSleep(startTime, &timeInfo);
   }
-#endif
 
-#elif defined(USE_OPEN_METEO)
+#elif WEATHER_API == OPEN_METEO
   int rxStatus = getOMCall(client, owm_onecall);
   if (rxStatus != HTTP_CODE_OK)
   {
@@ -316,7 +314,6 @@ void setup()
   float inTemp     = NAN;
   float inHumidity = NAN;
 
-#if INDOOR
 #if SENSOR == BME280
   Serial.print(String(TXT_READING_FROM) + " BME280... ");
   Adafruit_BME280 bme;
@@ -353,7 +350,6 @@ void setup()
     Serial.println(statusStr);
   }
   digitalWrite(PIN_BME_PWR, LOW);
-#endif
 
   String refreshTimeStr;
   getRefreshTimeStr(refreshTimeStr, timeConfigured, &timeInfo);

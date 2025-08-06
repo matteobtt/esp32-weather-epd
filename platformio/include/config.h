@@ -21,9 +21,6 @@
 #include <cstdint>
 #include <Arduino.h>
 
-#define INDOOR 0
-#define AIR_POLLUTION 0
-
 // DEFAULT CONFIGS
 
 #define HTTP 0

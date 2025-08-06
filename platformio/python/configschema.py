@@ -1,6 +1,6 @@
 from enum import Enum
 from typing import Annotated
-from pydantic import BaseModel, Field, WithJsonSchema, field_validator
+from pydantic import BaseModel, Field, WithJsonSchema, field_validator, model_validator
 
 class DocEnum(Enum):
     def __new__(cls, value, doc=None):
@@ -99,6 +99,10 @@ class Locale(str, Enum):
     NL_BE = "nl_BE"
     PT_BR = "pt_BR"
 
+class WeatherAPI(str, Enum):
+    OPEN_WEATHER_MAP = "OpenWeatherMap"
+    OPEN_METEO = "Open-Meteo"
+
 class Font(str, Enum):
     FREEMONO = "FreeMono"
     FREESANS = "FreeSans"
@@ -121,6 +125,7 @@ defined_enums: list[Enum] = [
     EpdPanel,
     EpdDriver,
     Sensor,
+    WeatherAPI,
     UnitsTemp,
     UnitsSpeed,
     UnitsPres,
@@ -147,6 +152,7 @@ class ConfigSchema(BaseModel):
     epdDriver: EpdDriver = EpdDriver.DESPI_C02
     sensor: Sensor = Sensor.BME280
     locale: Locale
+    weatherAPI: WeatherAPI = WeatherAPI.OPEN_WEATHER_MAP
     useImperialUnitsAsDefault: bool = False # TODO: Use locale to set units
     unitsTemp: UnitsTemp = Field(default_factory=lambda data: UnitsTemp.FAHRENHEIT if data['useImperialUnitsAsDefault'] else UnitsTemp.CELSIUS)
     unitsSpeed: UnitsSpeed = Field(default_factory=lambda data: UnitsSpeed.MILESPERHOUR if data['useImperialUnitsAsDefault'] else UnitsSpeed.KILOMETERSPERHOUR)
@@ -179,7 +185,7 @@ class ConfigSchema(BaseModel):
     bmeAddress: int | str = 0x76
     wifiSSID: str
     wifiPassword: str
-    owmApikey: str
+    owmApikey: str | None = None
     owmOnecallVersion: str = "3.0"
     latitude: str
     longitude: str
@@ -199,6 +205,12 @@ class ConfigSchema(BaseModel):
     @classmethod
     def validate_int(cls, v: int | str):
         return int(v, 0) if isinstance(v, str) else v
+    
+    @model_validator(mode="after")
+    def validate_apikey(self):
+        if self.owmApikey is None and self.weatherAPI == WeatherAPI.OPEN_WEATHER_MAP:
+            raise ValueError("The API key is required on OpenWeatherMap")
+        return self
 
 # TODO: JSON Schema
 #main_model_schema = ConfigSchema.model_json_schema()

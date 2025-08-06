@@ -450,7 +450,7 @@ bool isWindy(float wind_speed, float wind_gust)
           || wind_gust >= 40.2 /*m/s*/);
 }
 
-#if defined(USE_OPEN_WEATHER_MAP)
+#if WEATHER_API == OPEN_WEATHER_MAP
 /* Takes the current weather and today's daily weather forcast (from
  * OpenWeatherMap API response) and returns a pointer to the icon's 196x196
  * bitmap.
@@ -747,10 +747,7 @@ const uint8_t *getConditionsBitmap(int id, bool day, bool moon, bool cloudy,
     return getBitmap(wi_na, BitmapSize);
   }
 } // end getConditionsBitmap
-
-#endif // USE_OPEN_WEATHER_MAP
-
-#ifdef USE_OPEN_METEO
+#elif WEATHER_API == OPEN_METEO
 /* Takes the current weather and today's daily weather forcast (from
  * OpenMeteo API response) and returns a pointer to the icon's 196x196
  * bitmap.
@@ -975,7 +972,7 @@ const uint8_t *getConditionsBitmap(int id, bool day, bool moon, bool cloudy,
     return getBitmap(wi_na, BitmapSize);
   }
 } // end getConditionsBitmap
-#endif // USE_OPEN_METEO
+#endif
 
 /* Takes the daily weather forecast (from OpenWeatherMap API response) and
  * returns a pointer to the icon's 32x32 bitmap.
