@@ -302,9 +302,9 @@ void drawCurrentConditions(const owm_current_t &current,
 #if UNITS_TEMP == KELVIN
   dataStr = String(TXT_FEELS_LIKE) + ' ' + String(static_cast<int>(std::round(celsius_to_kelvin(current.feels_like)))) + 'K';
 #elif UNITS_TEMP == CELSIUS
-  dataStr = String(TXT_FEELS_LIKE) + ' ' + String(static_cast<int>(std::round(current.feels_like))) + '\260C';
+  dataStr = String(TXT_FEELS_LIKE) + ' ' + String(static_cast<int>(std::round(current.feels_like))) + "\260C";
 #elif UNITS_TEMP == FAHRENHEIT
-  dataStr = String(TXT_FEELS_LIKE) + ' ' + String(static_cast<int>(std::round(celsius_to_fahrenheit(current.feels_like)))) + '\260F';
+  dataStr = String(TXT_FEELS_LIKE) + ' ' + String(static_cast<int>(std::round(celsius_to_fahrenheit(current.feels_like)))) + "\260F";
 #endif
   display.setFont(&FONT_12pt8b);
 #if EPD_PANEL != DISP_BW_V1
@@ -513,10 +513,10 @@ void drawCurrentConditions(const owm_current_t &current,
 #if UNITS_TEMP == KELVIN
     dataStr = String(std::round(celsius_to_kelvin(inTemp) * 10) / 10.0f, 1) + 'K';
 #elif UNITS_TEMP == CELSIUS
-    dataStr = String(std::round(inTemp * 10) / 10.0f, 1) + '\260C';
+    dataStr = String(std::round(inTemp * 10) / 10.0f, 1) + "\260C";
 #elif UNITS_TEMP == FAHRENHEIT
     dataStr = String(static_cast<int>(
-              std::round(celsius_to_fahrenheit(inTemp)))) + '\260F';
+              std::round(celsius_to_fahrenheit(inTemp)))) + "\260F";
 #endif
   }
   else
