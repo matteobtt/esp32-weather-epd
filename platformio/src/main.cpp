@@ -251,9 +251,9 @@ void setup()
 #elif HTTP_MODE == HTTPS_WITH_CERT_VERIF
   WiFiClientSecure client;
 #if WEATHER_API == OPEN_WEATHER_MAP
-  client.setCACert(cert_Sectigo_RSA_Organization_Validation_Secure_Server_CA);
+  client.setCACert(cert_USERTrust_RSA_Certification_Authority);
 #elif WEATHER_API == OPEN_METEO
-  client.setCACert(cert_R11);
+  client.setCACert(cert_ISRG_Root_X1);
 #endif
 #endif
 #if WEATHER_API == OPEN_WEATHER_MAP
