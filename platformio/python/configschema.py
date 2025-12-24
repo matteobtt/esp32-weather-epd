@@ -98,6 +98,7 @@ class Locale(str, Enum):
     IT_IT = "it_IT"
     NL_BE = "nl_BE"
     PT_BR = "pt_BR"
+    ES_ES = "es_ES"
 
 class WeatherAPI(str, Enum):
     OPEN_WEATHER_MAP = "OpenWeatherMap"
@@ -166,7 +167,9 @@ class ConfigSchema(BaseModel):
     displayDailyPrecip: DisplayDailyPrecip = DisplayDailyPrecip.PRECIP_SMART
     displayHourlyIcons: bool = True
     displayAlerts: bool = True
+    statusBarExtrasBatPercentage: bool = True
     statusBarExtrasBatVoltage: bool = False
+    statusBarExtrasWifiStrength: bool = True
     statusBarExtrasWifiRSSI: bool = False
     batteryMonitoring: bool = True
     debugLevel: int = 0 # TODO: From 0 to 2
