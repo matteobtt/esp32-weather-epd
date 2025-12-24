@@ -265,8 +265,7 @@ void powerOffDisplay()
  */
 void drawCurrentConditions(const owm_current_t &current,
                            const owm_daily_t &today,
-                           const owm_resp_air_pollution_t &owm_air_pollution,
-                           float inTemp, float inHumidity)
+                           const owm_resp_air_pollution_t &owm_air_pollution)
 {
   String dataStr, unitStr;
   // current weather icon
@@ -325,8 +324,6 @@ void drawCurrentConditions(const owm_current_t &current,
 #if EPD_PANEL != DISP_BW_V1
   display.drawInvertedBitmap(0, 204 + (48 + 8) * 3,
                              air_filter_48x48, 48, 48, GxEPD_BLACK);
-  display.drawInvertedBitmap(0, 204 + (48 + 8) * 4,
-                             house_thermometer_48x48, 48, 48, GxEPD_BLACK);
 #endif
   display.drawInvertedBitmap(170, 204 + (48 + 8) * 0,
                              wi_sunset_48x48, 48, 48, GxEPD_BLACK);
@@ -337,8 +334,6 @@ void drawCurrentConditions(const owm_current_t &current,
 #if EPD_PANEL != DISP_BW_V1
   display.drawInvertedBitmap(170, 204 + (48 + 8) * 3,
                              visibility_icon_48x48, 48, 48, GxEPD_BLACK);
-  display.drawInvertedBitmap(170, 204 + (48 + 8) * 4,
-                             house_humidity_48x48, 48, 48, GxEPD_BLACK);
 #endif
 
   // current weather data labels
@@ -357,14 +352,12 @@ void drawCurrentConditions(const owm_current_t &current,
     air_quality_index_label = TXT_AIR_POLLUTION;
   }
   drawString(48, 204 + 10 + (48 + 8) * 3, air_quality_index_label, LEFT);
-  drawString(48, 204 + 10 + (48 + 8) * 4, TXT_INDOOR_TEMPERATURE, LEFT);
 #endif
   drawString(170 + 48, 204 + 10 + (48 + 8) * 0, TXT_SUNSET, LEFT);
   drawString(170 + 48, 204 + 10 + (48 + 8) * 1, TXT_HUMIDITY, LEFT);
   drawString(170 + 48, 204 + 10 + (48 + 8) * 2, TXT_PRESSURE, LEFT);
 #if EPD_PANEL != DISP_BW_V1
   drawString(170 + 48, 204 + 10 + (48 + 8) * 3, TXT_VISIBILITY, LEFT);
-  drawString(170 + 48, 204 + 10 + (48 + 8) * 4, TXT_INDOOR_HUMIDITY, LEFT);
 #endif
 
   // sunrise
@@ -505,25 +498,6 @@ void drawCurrentConditions(const owm_current_t &current,
                         dataStr, LEFT, max_w, 2, 10);
     }
   }
-
-  // indoor temperature
-  display.setFont(&FONT_12pt8b);
-  if (!std::isnan(inTemp))
-  {
-#if UNITS_TEMP == KELVIN
-    dataStr = String(std::round(celsius_to_kelvin(inTemp) * 10) / 10.0f, 1) + 'K';
-#elif UNITS_TEMP == CELSIUS
-    dataStr = String(std::round(inTemp * 10) / 10.0f, 1) + "\260C";
-#elif UNITS_TEMP == FAHRENHEIT
-    dataStr = String(static_cast<int>(
-              std::round(celsius_to_fahrenheit(inTemp)))) + "\260F";
-#endif
-  }
-  else
-  {
-    dataStr = "--";
-  }
-  drawString(48, 204 + 17 / 2 + (48 + 8) * 4 + 48 / 2, dataStr, LEFT);
 #endif // EPD_PANEL != DISP_BW_V1
 
   // sunset
@@ -615,24 +589,69 @@ void drawCurrentConditions(const owm_current_t &current,
   display.setFont(&FONT_8pt8b);
   drawString(display.getCursorX(), 204 + 17 / 2 + (48 + 8) * 3 + 48 / 2,
              unitStr, LEFT);
-
-  // indoor humidity
-  display.setFont(&FONT_12pt8b);
-  if (!std::isnan(inHumidity))
-  {
-    dataStr = String(static_cast<int>(std::round(inHumidity)));
-  }
-  else
-  {
-    dataStr = "--";
-  }
-  drawString(170 + 48, 204 + 17 / 2 + (48 + 8) * 4 + 48 / 2, dataStr, LEFT);
-  display.setFont(&FONT_8pt8b);
-  drawString(display.getCursorX(), 204 + 17 / 2 + (48 + 8) * 4 + 48 / 2,
-             "%", LEFT);
 #endif // EPD_PANEL != DISP_BW_V1
   return;
 } // end drawCurrentConditions
+
+/* This function is responsible for drawing the indoor temperature and
+ * humidity.
+ */
+void drawIndoorData(float inTemp, float inHumidity)
+{
+  if(EPD_PANEL != DISP_BW_V1)
+  {
+    // icons
+    display.drawInvertedBitmap(0, 204 + (48 + 8) * 4,
+                              house_thermometer_48x48, 48, 48, GxEPD_BLACK);
+    display.drawInvertedBitmap(170, 204 + (48 + 8) * 4,
+                              house_humidity_48x48, 48, 48, GxEPD_BLACK);
+
+    // labels
+    display.setFont(&FONT_7pt8b);
+    drawString(48, 204 + 10 + (48 + 8) * 4, TXT_INDOOR_TEMPERATURE, LEFT);
+    drawString(170 + 48, 204 + 10 + (48 + 8) * 4, TXT_INDOOR_HUMIDITY, LEFT);
+    
+    String dataStr;
+    display.setFont(&FONT_12pt8b);
+
+    // temperature
+    if (!std::isnan(inTemp))
+    {
+      if (UNITS_TEMP == KELVIN)
+      {
+        dataStr = String(std::round(celsius_to_kelvin(inTemp) * 10) / 10.0f, 1) + 'K';
+      }
+      else if (UNITS_TEMP == CELSIUS)
+      {
+        dataStr = String(std::round(inTemp * 10) / 10.0f, 1) + "\260C";
+      }
+      else if (UNITS_TEMP == FAHRENHEIT)
+      {
+        dataStr = String(static_cast<int>(
+                  std::round(celsius_to_fahrenheit(inTemp)))) + "\260F";
+      }
+    }
+    else
+    {
+      dataStr = "--";
+    }
+    drawString(48, 204 + 17 / 2 + (48 + 8) * 4 + 48 / 2, dataStr, LEFT);
+
+    // humidity
+    if (!std::isnan(inHumidity))
+    {
+      dataStr = String(static_cast<int>(std::round(inHumidity)));
+    }
+    else
+    {
+      dataStr = "--";
+    }
+    drawString(170 + 48, 204 + 17 / 2 + (48 + 8) * 4 + 48 / 2, dataStr, LEFT);
+    display.setFont(&FONT_8pt8b);
+    drawString(display.getCursorX(), 204 + 17 / 2 + (48 + 8) * 4 + 48 / 2,
+              "%", LEFT);
+  }
+} // end drawIndoorData
 
 /* This function is responsible for drawing the five day forecast.
  */
@@ -1108,7 +1127,8 @@ void drawOutlookGraph(const owm_hourly_t *hourly, const owm_daily_t *daily,
 
       // draw hourly bitmap
 #if DISPLAY_HOURLY_ICONS
-      if (daily[day_idx].dt + 86400 <= hourly[i].dt) {
+      if (daily[day_idx].dt + 86400 <= hourly[i].dt)
+      {
         ++day_idx;
       }
       if ((i % hourInterval) == 0) // skip first and last tick

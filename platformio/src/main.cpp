@@ -361,15 +361,17 @@ void setup()
   initDisplay();
   do
   {
-    drawCurrentConditions(owm_onecall.current, owm_onecall.daily[0],
-                          owm_air_pollution, inTemp, inHumidity);
     Serial.println("Drawing current conditions");
-    drawOutlookGraph(owm_onecall.hourly, owm_onecall.daily, timeInfo);
+    drawCurrentConditions(owm_onecall.current, owm_onecall.daily[0],
+                          owm_air_pollution);
+    Serial.println("Drawing indoor temperature and humidity");
+    drawIndoorData(inTemp, inHumidity);
     Serial.println("Drawing outlook graph");
-    drawForecast(owm_onecall.daily, timeInfo);
+    drawOutlookGraph(owm_onecall.hourly, owm_onecall.daily, timeInfo);
     Serial.println("Drawing forecast");
-    drawLocationDate(CITY_STRING, dateStr);
+    drawForecast(owm_onecall.daily, timeInfo);
     Serial.println("Drawing location and date");
+    drawLocationDate(CITY_STRING, dateStr);
 #if DISPLAY_ALERTS
     drawAlerts(owm_onecall.alerts, CITY_STRING, dateStr);
 #endif
