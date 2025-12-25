@@ -196,6 +196,53 @@ void setup()
   prefs.end();
 
   String statusStr = {};
+
+  // GET INDOOR TEMPERATURE AND HUMIDITY, start BMEx80...
+  pinMode(PIN_BME_PWR, OUTPUT);
+  digitalWrite(PIN_BME_PWR, HIGH);
+  delay(11);
+  TwoWire I2C_bme = TwoWire(0);
+  I2C_bme.begin(PIN_BME_SDA, PIN_BME_SCL, 100000); // 100kHz
+  float inTemp     = NAN;
+  float inHumidity = NAN;
+
+#if SENSOR == BME280
+  Serial.print(String(TXT_READING_FROM) + " BME280... ");
+  Adafruit_BME280 bme;
+
+  if (bme.begin(BME_ADDRESS, &I2C_bme))
+  {
+#elif SENSOR == BME680
+  Serial.print(String(TXT_READING_FROM) + " BME680... ");
+  Adafruit_BME680 bme(&I2C_bme);
+
+  if (bme.begin(BME_ADDRESS))
+  {
+#endif
+    inTemp     = bme.readTemperature(); // Celsius
+    inHumidity = bme.readHumidity();    // %
+
+    // check if BME readings are valid
+    // note: readings are checked again before drawing to screen. If a reading
+    //       is not a number (NAN) then an error occurred, a dash '-' will be
+    //       displayed.
+    if (std::isnan(inTemp) || std::isnan(inHumidity))
+    {
+      statusStr = "BME " + String(TXT_READ_FAILED);
+      Serial.println(statusStr);
+    }
+    else
+    {
+      Serial.println(TXT_SUCCESS);
+    }
+  }
+  else
+  {
+    statusStr = "BME " + String(TXT_NOT_FOUND); // check wiring
+    Serial.println(statusStr);
+  }
+  digitalWrite(PIN_BME_PWR, LOW);
+
   String tmpStr = {};
   tm timeInfo = {};
 
@@ -305,52 +352,6 @@ void setup()
 #endif
 
   killWiFi(); // WiFi no longer needed
-
-  // GET INDOOR TEMPERATURE AND HUMIDITY, start BMEx80...
-  pinMode(PIN_BME_PWR, OUTPUT);
-  digitalWrite(PIN_BME_PWR, HIGH);
-  delay(11);
-  TwoWire I2C_bme = TwoWire(0);
-  I2C_bme.begin(PIN_BME_SDA, PIN_BME_SCL, 100000); // 100kHz
-  float inTemp     = NAN;
-  float inHumidity = NAN;
-
-#if SENSOR == BME280
-  Serial.print(String(TXT_READING_FROM) + " BME280... ");
-  Adafruit_BME280 bme;
-
-  if (bme.begin(BME_ADDRESS, &I2C_bme))
-  {
-#elif SENSOR == BME680
-  Serial.print(String(TXT_READING_FROM) + " BME680... ");
-  Adafruit_BME680 bme(&I2C_bme);
-
-  if (bme.begin(BME_ADDRESS))
-  {
-#endif
-    inTemp     = bme.readTemperature(); // Celsius
-    inHumidity = bme.readHumidity();    // %
-
-    // check if BME readings are valid
-    // note: readings are checked again before drawing to screen. If a reading
-    //       is not a number (NAN) then an error occurred, a dash '-' will be
-    //       displayed.
-    if (std::isnan(inTemp) || std::isnan(inHumidity))
-    {
-      statusStr = "BME " + String(TXT_READ_FAILED);
-      Serial.println(statusStr);
-    }
-    else
-    {
-      Serial.println(TXT_SUCCESS);
-    }
-  }
-  else
-  {
-    statusStr = "BME " + String(TXT_NOT_FOUND); // check wiring
-    Serial.println(statusStr);
-  }
-  digitalWrite(PIN_BME_PWR, LOW);
 
   String refreshTimeStr;
   getRefreshTimeStr(refreshTimeStr, timeConfigured, &timeInfo);
