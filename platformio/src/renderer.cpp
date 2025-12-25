@@ -1315,24 +1315,28 @@ void drawStatusBar(const String &statusStr, const String &refreshTimeStr,
 void drawError(const uint8_t *bitmap_196x196,
                const String &errMsgLn1, const String &errMsgLn2)
 {
-  display.setFont(&FONT_26pt8b);
-  if (!errMsgLn2.isEmpty())
+  initDisplay();
+  do
   {
-    drawString(DISP_WIDTH / 2,
-               DISP_HEIGHT / 2 + 196 / 2 + 21,
-               errMsgLn1, CENTER);
-    drawString(DISP_WIDTH / 2,
-               DISP_HEIGHT / 2 + 196 / 2 + 21 + 55,
-               errMsgLn2, CENTER);
-  }
-  else
-  {
-    drawMultiLnString(DISP_WIDTH / 2,
-                      DISP_HEIGHT / 2 + 196 / 2 + 21,
-                      errMsgLn1, CENTER, DISP_WIDTH - 200, 2, 55);
-  }
-  display.drawInvertedBitmap(DISP_WIDTH / 2 - 196 / 2,
-                             DISP_HEIGHT / 2 - 196 / 2 - 21,
-                             bitmap_196x196, 196, 196, ACCENT_COLOR);
-  return;
+    display.setFont(&FONT_26pt8b);
+    if (!errMsgLn2.isEmpty())
+    {
+      drawString(DISP_WIDTH / 2,
+                 DISP_HEIGHT / 2 + 196 / 2 + 21,
+                 errMsgLn1, CENTER);
+      drawString(DISP_WIDTH / 2,
+                 DISP_HEIGHT / 2 + 196 / 2 + 21 + 55,
+                 errMsgLn2, CENTER);
+    }
+    else
+    {
+      drawMultiLnString(DISP_WIDTH / 2,
+                        DISP_HEIGHT / 2 + 196 / 2 + 21,
+                        errMsgLn1, CENTER, DISP_WIDTH - 200, 2, 55);
+    }
+    display.drawInvertedBitmap(DISP_WIDTH / 2 - 196 / 2,
+                               DISP_HEIGHT / 2 - 196 / 2 - 21,
+                               bitmap_196x196, 196, 196, ACCENT_COLOR);
+  } while (display.nextPage());
+  powerOffDisplay();
 } // end drawError

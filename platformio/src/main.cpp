@@ -152,12 +152,7 @@ void setup()
     { // battery is now low for the first time
       prefs.putBool("lowBat", true);
       prefs.end();
-      initDisplay();
-      do
-      {
-        drawError(battery_alert_0deg_196x196, TXT_LOW_BATTERY);
-      } while (display.nextPage());
-      powerOffDisplay();
+      drawError(battery_alert_0deg_196x196, TXT_LOW_BATTERY);
     }
 
     if (batteryVoltage <= CRIT_LOW_BATTERY_VOLTAGE)
@@ -252,24 +247,16 @@ void setup()
   if (wifiStatus != WL_CONNECTED)
   { // WiFi Connection Failed
     killWiFi();
-    initDisplay();
     if (wifiStatus == WL_NO_SSID_AVAIL)
     {
       Serial.println(TXT_NETWORK_NOT_AVAILABLE);
-      do
-      {
-        drawError(wifi_x_196x196, TXT_NETWORK_NOT_AVAILABLE);
-      } while (display.nextPage());
+      drawError(wifi_x_196x196, TXT_NETWORK_NOT_AVAILABLE);
     }
     else
     {
       Serial.println(TXT_WIFI_CONNECTION_FAILED);
-      do
-      {
-        drawError(wifi_x_196x196, TXT_WIFI_CONNECTION_FAILED);
-      } while (display.nextPage());
+      drawError(wifi_x_196x196, TXT_WIFI_CONNECTION_FAILED);
     }
-    powerOffDisplay();
     beginDeepSleep(startTime, &timeInfo);
   }
 
@@ -280,12 +267,7 @@ void setup()
   {
     Serial.println(TXT_TIME_SYNCHRONIZATION_FAILED);
     killWiFi();
-    initDisplay();
-    do
-    {
-      drawError(wi_time_4_196x196, TXT_TIME_SYNCHRONIZATION_FAILED);
-    } while (display.nextPage());
-    powerOffDisplay();
+    drawError(wi_time_4_196x196, TXT_TIME_SYNCHRONIZATION_FAILED);
     beginDeepSleep(startTime, &timeInfo);
   }
 
@@ -310,12 +292,7 @@ void setup()
     killWiFi();
     statusStr = "One Call " + OWM_ONECALL_VERSION + " API";
     tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
-    initDisplay();
-    do
-    {
-      drawError(wi_cloud_down_196x196, statusStr, tmpStr);
-    } while (display.nextPage());
-    powerOffDisplay();
+    drawError(wi_cloud_down_196x196, statusStr, tmpStr);
     beginDeepSleep(startTime, &timeInfo);
   }
 
@@ -325,12 +302,7 @@ void setup()
     killWiFi();
     statusStr = "Air Pollution API";
     tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
-    initDisplay();
-    do
-    {
-      drawError(wi_cloud_down_196x196, statusStr, tmpStr);
-    } while (display.nextPage());
-    powerOffDisplay();
+    drawError(wi_cloud_down_196x196, statusStr, tmpStr);
     beginDeepSleep(startTime, &timeInfo);
   }
 
@@ -341,12 +313,7 @@ void setup()
     killWiFi();
     statusStr = "Open Meteo API";
     tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
-    initDisplay();
-    do
-    {
-      drawError(wi_cloud_down_196x196, statusStr, tmpStr);
-    } while (display.nextPage());
-    powerOffDisplay();
+    drawError(wi_cloud_down_196x196, statusStr, tmpStr);
     beginDeepSleep(startTime, &timeInfo);
   }
 #endif
