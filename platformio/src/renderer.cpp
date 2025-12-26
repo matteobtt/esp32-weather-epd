@@ -258,7 +258,7 @@ void powerOffDisplay()
                        // minimum power use
   digitalWrite(PIN_EPD_PWR, LOW);
   return;
-} // end initDisplay
+} // end powerOffDisplay
 
 /* This function is responsible for drawing the current conditions and
  * associated icons.
@@ -501,6 +501,7 @@ void drawCurrentConditions(const owm_current_t &current,
 #endif // EPD_PANEL != DISP_BW_V1
 
   // sunset
+  display.setFont(&FONT_12pt8b);
   memset(timeBuffer, '\0', sizeof(timeBuffer));
   ts = current.sunset;
   timeInfo = localtime(&ts);
