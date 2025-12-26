@@ -118,6 +118,89 @@ void beginDeepSleep(unsigned long startTime, tm *timeInfo)
   esp_deep_sleep_start();
 } // end beginDeepSleep
 
+bool getWeatherData(int &wifiRSSI, tm *timeInfo) {
+  String errorStr = {};
+  String tmpStr = {};
+
+  // START WIFI
+  wl_status_t wifiStatus = startWiFi(wifiRSSI);
+  if (wifiStatus != WL_CONNECTED)
+  { // WiFi Connection Failed
+    if (wifiStatus == WL_NO_SSID_AVAIL)
+    {
+      Serial.println(TXT_NETWORK_NOT_AVAILABLE);
+      drawError(wifi_x_196x196, TXT_NETWORK_NOT_AVAILABLE);
+    }
+    else
+    {
+      Serial.println(TXT_WIFI_CONNECTION_FAILED);
+      drawError(wifi_x_196x196, TXT_WIFI_CONNECTION_FAILED);
+    }
+    return false;
+  }
+
+  // TIME SYNCHRONIZATION
+  configTzTime(D_TIMEZONE, NTP_SERVER_1, NTP_SERVER_2);
+  if (!waitForSNTPSync(timeInfo))
+  {
+    Serial.println(TXT_TIME_SYNCHRONIZATION_FAILED);
+    drawError(wi_time_4_196x196, TXT_TIME_SYNCHRONIZATION_FAILED);
+    return false;
+  }
+
+  // MAKE API REQUESTS
+#if HTTP_MODE == HTTP
+  WiFiClient client;
+#elif HTTP_MODE == HTTPS_NO_CERT_VERIF
+  WiFiClientSecure client;
+  client.setInsecure();
+#elif HTTP_MODE == HTTPS_WITH_CERT_VERIF
+  WiFiClientSecure client;
+  if (WEATHER_API == OPEN_WEATHER_MAP)
+  {
+    client.setCACert(cert_USERTrust_RSA_Certification_Authority);
+  }
+  else if (WEATHER_API == OPEN_METEO)
+  {
+    client.setCACert(cert_ISRG_Root_X1);
+  }
+#endif
+
+  if (WEATHER_API == OPEN_WEATHER_MAP)
+  {
+    int rxStatus = getOWMonecall(client, owm_onecall);
+    if (rxStatus != HTTP_CODE_OK)
+    {
+      errorStr = "One Call " + OWM_ONECALL_VERSION + " API";
+      tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
+      drawError(wi_cloud_down_196x196, errorStr, tmpStr);
+      return false;
+    }
+
+    rxStatus = getOWMairpollution(client, owm_air_pollution);
+    if (rxStatus != HTTP_CODE_OK)
+    {
+      errorStr = "Air Pollution API";
+      tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
+      drawError(wi_cloud_down_196x196, errorStr, tmpStr);
+      return false;
+    }
+  }
+  else if (WEATHER_API == OPEN_METEO)
+  {
+    int rxStatus = getOMCall(client, owm_onecall);
+    if (rxStatus != HTTP_CODE_OK)
+    {
+      errorStr = "Open Meteo API";
+      tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
+      drawError(wi_cloud_down_196x196, errorStr, tmpStr);
+      return false;
+    }
+  }
+
+  return true;
+}
+
 /* Program entry point.
  */
 void setup()
@@ -153,6 +236,7 @@ void setup()
       prefs.putBool("lowBat", true);
       prefs.end();
       drawError(battery_alert_0deg_196x196, TXT_LOW_BATTERY);
+      powerOffDisplay();
     }
 
     if (batteryVoltage <= CRIT_LOW_BATTERY_VOLTAGE)
@@ -238,113 +322,50 @@ void setup()
   }
   digitalWrite(PIN_BME_PWR, LOW);
 
-  String tmpStr = {};
   tm timeInfo = {};
 
-  // START WIFI
   int wifiRSSI = 0; // “Received Signal Strength Indicator"
-  wl_status_t wifiStatus = startWiFi(wifiRSSI);
-  if (wifiStatus != WL_CONNECTED)
-  { // WiFi Connection Failed
-    killWiFi();
-    if (wifiStatus == WL_NO_SSID_AVAIL)
-    {
-      Serial.println(TXT_NETWORK_NOT_AVAILABLE);
-      drawError(wifi_x_196x196, TXT_NETWORK_NOT_AVAILABLE);
-    }
-    else
-    {
-      Serial.println(TXT_WIFI_CONNECTION_FAILED);
-      drawError(wifi_x_196x196, TXT_WIFI_CONNECTION_FAILED);
-    }
-    beginDeepSleep(startTime, &timeInfo);
-  }
 
-  // TIME SYNCHRONIZATION
-  configTzTime(D_TIMEZONE, NTP_SERVER_1, NTP_SERVER_2);
-  bool timeConfigured = waitForSNTPSync(&timeInfo);
-  if (!timeConfigured)
-  {
-    Serial.println(TXT_TIME_SYNCHRONIZATION_FAILED);
-    killWiFi();
-    drawError(wi_time_4_196x196, TXT_TIME_SYNCHRONIZATION_FAILED);
-    beginDeepSleep(startTime, &timeInfo);
-  }
-
-  // MAKE API REQUESTS
-#if HTTP_MODE == HTTP
-  WiFiClient client;
-#elif HTTP_MODE == HTTPS_NO_CERT_VERIF
-  WiFiClientSecure client;
-  client.setInsecure();
-#elif HTTP_MODE == HTTPS_WITH_CERT_VERIF
-  WiFiClientSecure client;
-#if WEATHER_API == OPEN_WEATHER_MAP
-  client.setCACert(cert_USERTrust_RSA_Certification_Authority);
-#elif WEATHER_API == OPEN_METEO
-  client.setCACert(cert_ISRG_Root_X1);
-#endif
-#endif
-#if WEATHER_API == OPEN_WEATHER_MAP
-  int rxStatus = getOWMonecall(client, owm_onecall);
-  if (rxStatus != HTTP_CODE_OK)
-  {
-    killWiFi();
-    statusStr = "One Call " + OWM_ONECALL_VERSION + " API";
-    tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
-    drawError(wi_cloud_down_196x196, statusStr, tmpStr);
-    beginDeepSleep(startTime, &timeInfo);
-  }
-
-  rxStatus = getOWMairpollution(client, owm_air_pollution);
-  if (rxStatus != HTTP_CODE_OK)
-  {
-    killWiFi();
-    statusStr = "Air Pollution API";
-    tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
-    drawError(wi_cloud_down_196x196, statusStr, tmpStr);
-    beginDeepSleep(startTime, &timeInfo);
-  }
-
-#elif WEATHER_API == OPEN_METEO
-  int rxStatus = getOMCall(client, owm_onecall);
-  if (rxStatus != HTTP_CODE_OK)
-  {
-    killWiFi();
-    statusStr = "Open Meteo API";
-    tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
-    drawError(wi_cloud_down_196x196, statusStr, tmpStr);
-    beginDeepSleep(startTime, &timeInfo);
-  }
-#endif
+  bool dataSuccess = getWeatherData(wifiRSSI, &timeInfo);
 
   killWiFi(); // WiFi no longer needed
 
-  String refreshTimeStr;
-  getRefreshTimeStr(refreshTimeStr, timeConfigured, &timeInfo);
-  String dateStr;
-  getDateStr(dateStr, &timeInfo);
+  if (dataSuccess) {
+    String refreshTimeStr;
+    getRefreshTimeStr(refreshTimeStr, true, &timeInfo);
+    String dateStr;
+    getDateStr(dateStr, &timeInfo);
 
-  // RENDER FULL REFRESH
-  initDisplay();
+    // RENDER FULL REFRESH
+    initDisplay();
+    do
+    {
+      Serial.println("Drawing current conditions");
+      drawCurrentConditions(owm_onecall.current, owm_onecall.daily[0],
+                            owm_air_pollution);
+      Serial.println("Drawing outlook graph");
+      drawOutlookGraph(owm_onecall.hourly, owm_onecall.daily, timeInfo);
+      Serial.println("Drawing forecast");
+      drawForecast(owm_onecall.daily, timeInfo);
+      Serial.println("Drawing location and date");
+      drawLocationDate(CITY_STRING, dateStr);
+      if (DISPLAY_ALERTS)
+      {
+        drawAlerts(owm_onecall.alerts, CITY_STRING, dateStr);
+      }
+      drawStatusBar(statusStr, refreshTimeStr, wifiRSSI, batteryVoltage);
+    } while (display.nextPage());
+  }
+
+  // Render indoor temperature and humidity
+  Serial.println("Drawing indoor temperature and humidity");
+  display.setPartialWindow(0, 204 + (48 + 8) * 4, 312, 48);
+  display.firstPage();
   do
   {
-    Serial.println("Drawing current conditions");
-    drawCurrentConditions(owm_onecall.current, owm_onecall.daily[0],
-                          owm_air_pollution);
-    Serial.println("Drawing indoor temperature and humidity");
     drawIndoorData(inTemp, inHumidity);
-    Serial.println("Drawing outlook graph");
-    drawOutlookGraph(owm_onecall.hourly, owm_onecall.daily, timeInfo);
-    Serial.println("Drawing forecast");
-    drawForecast(owm_onecall.daily, timeInfo);
-    Serial.println("Drawing location and date");
-    drawLocationDate(CITY_STRING, dateStr);
-#if DISPLAY_ALERTS
-    drawAlerts(owm_onecall.alerts, CITY_STRING, dateStr);
-#endif
-    drawStatusBar(statusStr, refreshTimeStr, wifiRSSI, batteryVoltage);
   } while (display.nextPage());
+
   powerOffDisplay();
 
   // DEEP SLEEP

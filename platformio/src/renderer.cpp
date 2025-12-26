@@ -1339,5 +1339,4 @@ void drawError(const uint8_t *bitmap_196x196,
                                DISP_HEIGHT / 2 - 196 / 2 - 21,
                                bitmap_196x196, 196, 196, ACCENT_COLOR);
   } while (display.nextPage());
-  powerOffDisplay();
 } // end drawError
