@@ -1,7 +1,7 @@
 ## Changes made to this fork
 - Configuration moved to a non-versioned JSON file which is processed by a Python script to generate C++ defines.
 - Added Open-Meteo weather source.
-- Added 11ms delay after sensor power up because it wasn't working.
+- ~~Added 11ms delay after sensor power up because it wasn't working.~~ [Fixed upstream](https://github.com/lmarzen/esp32-weather-epd/pull/211)
 - Full degree unit in indoor and feels like temperature.
 - Default to display the min temperature first, then the max temperature.
 
