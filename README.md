@@ -3,6 +3,7 @@
 - Added Open-Meteo weather source.
 - Added 11ms delay after sensor power up because it wasn't working.
 - Full degree unit in indoor and feels like temperature.
+- Default to display the min temperature first, then the max temperature.
 
 ---
 
