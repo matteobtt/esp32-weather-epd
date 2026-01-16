@@ -285,8 +285,6 @@ void drawCurrentSunrise(const owm_current_t &current)
   tm *timeInfo = localtime(&ts);
   _strftime(timeBuffer, sizeof(timeBuffer), TIME_FORMAT, timeInfo);
   drawString(48 + (162 * PosX), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2, timeBuffer, LEFT);
-
-  return;
 }
 # endif
 // end drawCurrentSunrise
@@ -361,8 +359,6 @@ void drawCurrentWind(const owm_current_t &current)
   drawString(display.getCursorX() + 6, 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2,
              dataStr, LEFT);
 #endif
-
-  return;
 }
 #endif
 // end drawCurrentWind
@@ -416,7 +412,6 @@ void drawCurrentUVI(const owm_current_t &current)
                         dataStr, LEFT, max_w, 2, 10);
     }
   }
-  return;
 }
 #endif
 // end drawCurrentUVI
@@ -490,8 +485,6 @@ void drawCurrentAirQuality(const owm_resp_air_pollution_t &owm_air_pollution)
                         dataStr, LEFT, max_w, 2, 10);
     }
   }
-
-  return;
 }
 #endif
 // end drawCurrentAirQuality
@@ -566,8 +559,6 @@ void drawCurrentSunset(const owm_current_t &current)
   tm *timeInfo = localtime(&ts);
   _strftime(timeBuffer, sizeof(timeBuffer), TIME_FORMAT, timeInfo);
   drawString(48 + (162 * PosX), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2, timeBuffer, LEFT);
-
-  return;
 }
 #endif
 // end drawCurrentSunset
@@ -595,7 +586,6 @@ void drawCurrentHumidity(const owm_current_t &current)
   display.setFont(&FONT_8pt8b);
   drawString(display.getCursorX(), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2,
              "%", LEFT);
-  return;
 }
 #endif
 // end drawCurrentHumidity
@@ -657,8 +647,6 @@ void drawCurrentPressure(const owm_current_t &current)
   display.setFont(&FONT_8pt8b);
   drawString(display.getCursorX(), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2,
              unitStr, LEFT);
-
-  return;
 }
 #endif
 // end drawCurrentPressure
@@ -710,8 +698,6 @@ void drawCurrentVisibility(const owm_current_t &current)
   display.setFont(&FONT_8pt8b);
   drawString(display.getCursorX(), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2,
              unitStr, LEFT);
-
-  return;
 }
 #endif
 // end drawCurrentVisibility
@@ -778,8 +764,6 @@ void drawCurrentMoonrise(const owm_daily_t &today)
   tm *timeInfo = localtime(&ts);
   _strftime(timeBuffer, sizeof(timeBuffer), TIME_FORMAT, timeInfo);
   drawString(48 + (162 * PosX), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2, timeBuffer, LEFT);
-
-  return;
 }
 # endif
 // end drawCurrentMoonrise
@@ -806,8 +790,6 @@ void drawCurrentMoonset(const owm_daily_t &today)
   tm *timeInfo = localtime(&ts);
   _strftime(timeBuffer, sizeof(timeBuffer), TIME_FORMAT, timeInfo);
   drawString(48 + (162 * PosX), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2, timeBuffer, LEFT);
-
-  return;
 }
 #endif
 // end drawCurrentMoonset
@@ -853,19 +835,17 @@ void drawCurrentMoonphase(const owm_daily_t &daily)
                         dataStr, LEFT, max_w, 2, 10);
     }
   }
-
-  return;
 }
 #endif
 // end drawCurrentMoonphase
 
 // drawCurrentDewpoint
-#ifdef POS_DEWPOINT
+#ifdef POS_DEW_POINT
 void drawCurrentDewpoint(const owm_current_t &current)
 {
   String dataStr, unitStr;
-  int PosX = (POS_DEWPOINT % 2);
-  int PosY = static_cast<int>(POS_DEWPOINT / 2);
+  int PosX = (POS_DEW_POINT % 2);
+  int PosY = static_cast<int>(POS_DEW_POINT / 2);
   
   // icons
   display.drawInvertedBitmap(162 * PosX, 204 + (48 + 8) * PosY,
@@ -881,26 +861,25 @@ void drawCurrentDewpoint(const owm_current_t &current)
   display.setFont(&FONT_12pt8b);
   if (!std::isnan(current.dew_point))
   {
-#ifdef UNITS_TEMP_KELVIN
-  dataStr = String(std::round(current.dew_point * 10) / 10.0f, 1);
-#endif
-#ifdef UNITS_TEMP_CELSIUS
-  dataStr = String(std::round(kelvin_to_celsius(current.dew_point) * 10) / 10.0f, 1);
-#endif
-#ifdef UNITS_TEMP_FAHRENHEIT
-  dataStr = String(static_cast<int>(
-            std::round(kelvin_to_fahrenheit(current.dew_point))));
-#endif
+    if (UNITS_TEMP == KELVIN)
+    {
+      dataStr = String(std::round(celsius_to_kelvin(current.dew_point) * 10) / 10.0f, 1) + "K";
+    }
+    else if (UNITS_TEMP == CELSIUS)
+    {
+      dataStr = String(std::round(current.dew_point * 10) / 10.0f, 1) + "\260C";
+    }
+    else if (UNITS_TEMP == FAHRENHEIT)
+    {
+      dataStr = String(static_cast<int>(
+        std::round(celsius_to_fahrenheit(current.dew_point)))) + "\260F";
+    }
   }
   else
   {
     dataStr = "--";
   }
-#if defined(UNITS_TEMP_CELSIUS) || defined(UNITS_TEMP_FAHRENHEIT)
-  dataStr += "\260";
-#endif
   drawString(48 + (162 * PosX), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2, dataStr, LEFT);
-  return;
 } 
 #endif
 // end drawCurrentDewpoint
@@ -1014,7 +993,7 @@ void drawCurrentConditions(const owm_current_t &current,
       drawCurrentMoonphase(today);
     # endif
   
-    # ifdef POS_DEWPOINT
+    # ifdef POS_DEW_POINT
       drawCurrentDewpoint(current);
     # endif
   

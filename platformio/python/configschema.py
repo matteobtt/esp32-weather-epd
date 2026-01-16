@@ -176,6 +176,7 @@ class ConfigSchema(BaseModel):
     posMoonrise: int | None = None
     posMoonset: int | None = None
     posMoonphase: int | None = None
+    posDewPoint: int | None = None
     invertMoonphaseColor: bool = False
     font: Font = Font.FREESANS
     tempOrderHL: bool = False
