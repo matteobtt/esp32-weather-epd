@@ -220,8 +220,6 @@ void drawMultiLnString(int16_t x, int16_t y, const String &text,
   return;
 } // end drawMultiLnString
 
-// SPIClass hspi(HSPI);
-
 /* Initialize e-paper display
  */
 void initDisplay()
@@ -424,12 +422,12 @@ void drawCurrentUVI(const owm_current_t &current)
 // end drawCurrentUVI
 
 // drawCurrentAirQuality
-#ifdef POS_AIR_QULITY
+#ifdef POS_AIR_QUALITY
 void drawCurrentAirQuality(const owm_resp_air_pollution_t &owm_air_pollution)
 {
   String dataStr, unitStr;
-  int PosX = (POS_AIR_QULITY % 2);
-  int PosY = static_cast<int>(POS_AIR_QULITY / 2);
+  int PosX = (POS_AIR_QUALITY % 2);
+  int PosY = static_cast<int>(POS_AIR_QUALITY / 2);
   
   // icons
   display.drawInvertedBitmap(162 * PosX, 204 + (48 + 8) * PosY,
@@ -499,45 +497,49 @@ void drawCurrentAirQuality(const owm_resp_air_pollution_t &owm_air_pollution)
 // end drawCurrentAirQuality
 
 // drawCurrentInTemp
-#ifdef POS_INTEMP
+#ifdef POS_IN_TEMP
 void drawCurrentInTemp(float inTemp)
 {
   String dataStr, unitStr;
-  int PosX = (POS_INTEMP % 2);
-  int PosY = static_cast<int>(POS_INTEMP / 2);
+  int PosX = (POS_IN_TEMP % 2);
+  int PosY = static_cast<int>(POS_IN_TEMP / 2);
   
-  // icons
-  display.drawInvertedBitmap(162 * PosX, 204 + (48 + 8) * PosY,
-                             house_thermometer_48x48, 48, 48, GxEPD_BLACK);
-
-  // labels
-  display.setFont(&FONT_7pt8b);
-  drawString(48 + (162 * PosX), 204 + 10 + (48 + 8) * PosY, TXT_INDOOR_TEMPERATURE, LEFT);
-
-  // indoor temperature
-  display.setFont(&FONT_12pt8b);
-  if (!std::isnan(inTemp))
+  display.setPartialWindow(160 * PosX, 204 + (48 + 8) * PosY, 152, 48);
+  display.firstPage();
+  do
   {
-#ifdef UNITS_TEMP_KELVIN
-    dataStr = String(std::round(celsius_to_kelvin(inTemp) * 10) / 10.0f, 1);
-#endif
-#ifdef UNITS_TEMP_CELSIUS
-    dataStr = String(std::round(inTemp * 10) / 10.0f, 1);
-#endif
-#ifdef UNITS_TEMP_FAHRENHEIT
-    dataStr = String(static_cast<int>(
-              std::round(celsius_to_fahrenheit(inTemp))));
-#endif
-  }
-  else
-  {
-    dataStr = "--";
-  }
-#if defined(UNITS_TEMP_CELSIUS) || defined(UNITS_TEMP_FAHRENHEIT)
-  dataStr += "\260";
-#endif
-  drawString(48 + (162 * PosX), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2, dataStr, LEFT);
-  return;
+    // icons
+    display.drawInvertedBitmap(162 * PosX, 204 + (48 + 8) * PosY,
+                              house_thermometer_48x48, 48, 48, GxEPD_BLACK);
+
+    // labels
+    display.setFont(&FONT_7pt8b);
+    drawString(48 + (162 * PosX), 204 + 10 + (48 + 8) * PosY, TXT_INDOOR_TEMPERATURE, LEFT);
+
+    // indoor temperature
+    display.setFont(&FONT_12pt8b);
+    if (!std::isnan(inTemp))
+    {
+      if (UNITS_TEMP == KELVIN)
+      {
+        dataStr = String(std::round(celsius_to_kelvin(inTemp) * 10) / 10.0f, 1) + 'K';
+      }
+      else if (UNITS_TEMP == CELSIUS)
+      {
+        dataStr = String(std::round(inTemp * 10) / 10.0f, 1) + "\260C";
+      }
+      else if (UNITS_TEMP == FAHRENHEIT)
+      {
+        dataStr = String(static_cast<int>(
+                  std::round(celsius_to_fahrenheit(inTemp)))) + "\260F";
+      }
+    }
+    else
+    {
+      dataStr = "--";
+    }
+    drawString(48 + (162 * PosX), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2, dataStr, LEFT);
+  } while (display.nextPage());
 } 
 #endif
 // end drawCurrentInTemp
@@ -715,36 +717,40 @@ void drawCurrentVisibility(const owm_current_t &current)
 // end drawCurrentVisibility
 
 // drawCurrentInHumidit
-#ifdef POS_INHUMIDITY
+#ifdef POS_IN_HUMIDITY
 void drawCurrentInHumidity(float inHumidity)
 {
   String dataStr, unitStr;
-  int PosX = (POS_INHUMIDITY % 2);
-  int PosY = static_cast<int>(POS_INHUMIDITY / 2);
+  int PosX = (POS_IN_HUMIDITY % 2);
+  int PosY = static_cast<int>(POS_IN_HUMIDITY / 2);
   
-  // current weather data icons
-  display.drawInvertedBitmap(162 * PosX, 204 + (48 + 8) * PosY,
-                             house_humidity_48x48, 48, 48, GxEPD_BLACK);
-
-  // current weather data labels
-  display.setFont(&FONT_7pt8b);
-  drawString(48 + (162 * PosX), 204 + 10 + (48 + 8) * PosY, TXT_INDOOR_HUMIDITY, LEFT);
-
-  // indoor humidity
-  display.setFont(&FONT_12pt8b);
-  if (!std::isnan(inHumidity))
+  display.setPartialWindow(160 * PosX, 204 + (48 + 8) * PosY, 152, 48);
+  display.firstPage();
+  do
   {
-    dataStr = String(static_cast<int>(std::round(inHumidity)));
-  }
-  else
-  {
-    dataStr = "--";
-  }
-  drawString(48 + (162 * PosX), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2, dataStr, LEFT);
-  display.setFont(&FONT_8pt8b);
-  drawString(display.getCursorX(), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2,
-             "%", LEFT);
-  return;
+    // current weather data icons
+    display.drawInvertedBitmap(162 * PosX, 204 + (48 + 8) * PosY,
+                              house_humidity_48x48, 48, 48, GxEPD_BLACK);
+
+    // current weather data labels
+    display.setFont(&FONT_7pt8b);
+    drawString(48 + (162 * PosX), 204 + 10 + (48 + 8) * PosY, TXT_INDOOR_HUMIDITY, LEFT);
+
+    // indoor humidity
+    display.setFont(&FONT_12pt8b);
+    if (!std::isnan(inHumidity))
+    {
+      dataStr = String(static_cast<int>(std::round(inHumidity)));
+    }
+    else
+    {
+      dataStr = "--";
+    }
+    drawString(48 + (162 * PosX), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2, dataStr, LEFT);
+    display.setFont(&FONT_8pt8b);
+    drawString(display.getCursorX(), 204 + 17 / 2 + (48 + 8) * PosY + 48 / 2,
+              "%", LEFT);
+  } while (display.nextPage());
 } 
 #endif
 // end drawCurrentInHumidity
@@ -860,8 +866,7 @@ void drawCurrentMoonphase(const owm_daily_t &daily)
  */
 void drawCurrentConditions(const owm_current_t &current,
                            const owm_daily_t &today,
-                           const owm_resp_air_pollution_t &owm_air_pollution,
-                           float inTemp, float inHumidity)
+                           const owm_resp_air_pollution_t &owm_air_pollution)
 {
   String dataStr, unitStr;
   // current weather icon
@@ -870,52 +875,48 @@ void drawCurrentConditions(const owm_current_t &current,
                              196, 196, GxEPD_BLACK);
 
   // current temp
-#ifdef UNITS_TEMP_KELVIN
-  dataStr = String(static_cast<int>(std::round(current.temp)));
+#if UNITS_TEMP == KELVIN
+  dataStr = String(static_cast<int>(
+      std::round(celsius_to_kelvin(current.temp))));
   unitStr = TXT_UNITS_TEMP_KELVIN;
-#endif
-#ifdef UNITS_TEMP_CELSIUS
-  dataStr = String(static_cast<int>(
-            std::round(kelvin_to_celsius(current.temp))));
+#elif UNITS_TEMP == CELSIUS
+  dataStr = String(static_cast<int>(std::round(current.temp)));
   unitStr = TXT_UNITS_TEMP_CELSIUS;
-#endif
-#ifdef UNITS_TEMP_FAHRENHEIT
+#elif UNITS_TEMP == FAHRENHEIT
   dataStr = String(static_cast<int>(
-            std::round(kelvin_to_fahrenheit(current.temp))));
+      std::round(celsius_to_fahrenheit(current.temp))));
   unitStr = TXT_UNITS_TEMP_FAHRENHEIT;
 #endif
   // FONT_**_temperature fonts only have the character set used for displaying
   // temperature (0123456789.-\260)
   display.setFont(&FONT_48pt8b_temperature);
-#ifndef DISP_BW_V1
+#if EPD_PANEL != DISP_BW_V1
     drawString(196 + 164 / 2 - 20, 196 / 2 + 69 / 2, dataStr, CENTER);
-#elif defined(DISP_BW_V1)
+#else
     drawString(156 + 164 / 2 - 20, 196 / 2 + 69 / 2, dataStr, CENTER);
 #endif
   display.setFont(&FONT_14pt8b);
   drawString(display.getCursorX(), 196 / 2 - 69 / 2 + 20, unitStr, LEFT);
 
   // current feels like
-#ifdef UNITS_TEMP_KELVIN
+#if UNITS_TEMP == KELVIN
   dataStr = String(TXT_FEELS_LIKE) + ' '
-            + String(static_cast<int>(std::round(current.feels_like)));
-#endif
-#ifdef UNITS_TEMP_CELSIUS
+    + String(static_cast<int>(std::round(
+        celsius_to_kelvin(current.feels_like))))
+    + 'K';
+#elif UNITS_TEMP == CELSIUS
   dataStr = String(TXT_FEELS_LIKE) + ' '
-            + String(static_cast<int>(std::round(
-                     kelvin_to_celsius(current.feels_like))))
-            + '\260';
-#endif
-#ifdef UNITS_TEMP_FAHRENHEIT
+    + String(static_cast<int>(std::round(current.feels_like)))+ "\260C";
+#elif UNITS_TEMP == FAHRENHEIT
   dataStr = String(TXT_FEELS_LIKE) + ' '
-            + String(static_cast<int>(std::round(
-                     kelvin_to_fahrenheit(current.feels_like))))
-            + '\260';
+    + String(static_cast<int>(std::round(
+        celsius_to_fahrenheit(current.feels_like))))
+    + "\260F";
 #endif
   display.setFont(&FONT_12pt8b);
-#ifndef DISP_BW_V1
+#if EPD_PANEL != DISP_BW_V1
   drawString(196 + 164 / 2, 98 + 69 / 2 + 12 + 17, dataStr, CENTER);
-#elif defined(DISP_BW_V1)
+#else
   drawString(156 + 164 / 2, 98 + 69 / 2 + 12 + 17, dataStr, CENTER);
 #endif
   // line dividing top and bottom display areas
@@ -951,17 +952,9 @@ void drawCurrentConditions(const owm_current_t &current,
       drawCurrentVisibility(current);  
     # endif   
 
-    # ifdef POS_AIR_QULITY
+    # ifdef POS_AIR_QUALITY
       drawCurrentAirQuality(owm_air_pollution);
-    # endif   
-
-    # ifdef POS_INTEMP
-      drawCurrentInTemp(inTemp);  
-    # endif   
-
-    # ifdef POS_INHUMIDITY
-      drawCurrentInHumidity(inHumidity);  
-    # endif   
+    # endif     
 
     # ifdef POS_MOONRISE
      drawCurrentMoonrise(today);

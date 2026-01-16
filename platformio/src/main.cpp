@@ -358,13 +358,14 @@ void setup()
   }
 
   // Render indoor temperature and humidity
-  Serial.println("Drawing indoor temperature and humidity");
-  display.setPartialWindow(0, 204 + (48 + 8) * 4, 312, 48);
-  display.firstPage();
-  do
-  {
-    drawIndoorData(inTemp, inHumidity);
-  } while (display.nextPage());
+#ifdef POS_IN_TEMP
+  Serial.println("Drawing indoor temperature");
+  drawCurrentInTemp(inTemp);
+#endif
+#ifdef POS_IN_HUMIDITY
+  Serial.println("Drawing indoor humidity");
+  drawCurrentInHumidity(inHumidity);
+#endif
 
   powerOffDisplay();
 

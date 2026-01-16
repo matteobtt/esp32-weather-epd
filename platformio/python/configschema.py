@@ -163,6 +163,20 @@ class ConfigSchema(BaseModel):
     unitsDailyPrecip: UnitsPrecip = Field(default_factory=lambda data: UnitsPrecip.INCHES if data['useImperialUnitsAsDefault'] else UnitsPrecip.MILLIMETERS)
     windDirectionLabel: WindDirectionLabel = WindDirectionLabel.WIND_HIDDEN
     windArrowPrecision: WindArrowPrecision = WindArrowPrecision.SECONDARY_INTERCARDINAL
+    posSunrise: int | None = 0
+    posSunset: int | None = 1
+    posWind: int | None = 2
+    posHumidity: int | None = 3
+    posUVI: int | None = 4
+    posPressure: int | None = 5
+    posAirQuality: int | None = 6
+    posVisibility: int | None = 7
+    posInTemp: int | None = 8
+    posInHumidity: int | None = 9
+    posMoonrise: int | None = None
+    posMoonset: int | None = None
+    posMoonphase: int | None = None
+    invertMoonphaseColor: bool = False
     font: Font = Font.FREESANS
     tempOrderHL: bool = False
     displayDailyPrecip: DisplayDailyPrecip = DisplayDailyPrecip.PRECIP_SMART

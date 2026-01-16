@@ -2028,7 +2028,7 @@ void disableBuiltinLED()
 } // end disableBuiltinLED
 
 // Define the set of moon phase icon base on the chosen moon phase style
-#ifdef MOONPHASE_PRIMARY
+#if INVERT_MOONPHASE_COLOR
 static const unsigned char *moon_phase_icon_arr[] = {
 wi_moon_new_48x48,
 wi_moon_waxing_crescent_1_48x48,
@@ -2059,10 +2059,7 @@ wi_moon_waning_crescent_4_48x48,
 wi_moon_waning_crescent_5_48x48,
 wi_moon_waning_crescent_6_48x48,
 wi_moon_new_48x48 }; 
-#endif
-// end MOONPHASE_PRIMARY
-
-#ifdef MOONPHASE_ALTERNATIVE
+#else
 static const unsigned char *moon_phase_icon_arr[] = {
 wi_moon_alt_new_48x48,
 wi_moon_alt_waxing_crescent_1_48x48,
@@ -2094,7 +2091,7 @@ wi_moon_alt_waning_crescent_5_48x48,
 wi_moon_alt_waning_crescent_6_48x48,
 wi_moon_alt_new_48x48 }; 
 #endif
-// end MOONPHASE_ALTERNATIVE
+// end moonphase style
 
 /*  Returns the 48x48 moon phase icon bitmap based on api response between 0 and 1
  *  0 and 1 means new moon
