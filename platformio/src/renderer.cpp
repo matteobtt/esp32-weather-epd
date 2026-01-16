@@ -698,13 +698,12 @@ void drawForecast(const owm_daily_t *daily, tm timeInfo)
                 std::round(celsius_to_fahrenheit(daily[i].temp.min)))) +
             "\260";
 #endif
-#ifdef TEMP_ORDER_HL
-    drawString(x + 31 - 4, 98 + 69 / 2 + 38 - 6 + 12, hiStr, RIGHT);
-    drawString(x + 31 + 5, 98 + 69 / 2 + 38 - 6 + 12, loStr, LEFT);
-#endif
-#ifdef TEMP_ORDER_LH
+#if !TEMP_ORDER_HL
     drawString(x + 31 - 4, 98 + 69 / 2 + 38 - 6 + 12, loStr, RIGHT);
     drawString(x + 31 + 5, 98 + 69 / 2 + 38 - 6 + 12, hiStr, LEFT);
+#else
+    drawString(x + 31 - 4, 98 + 69 / 2 + 38 - 6 + 12, hiStr, RIGHT);
+    drawString(x + 31 + 5, 98 + 69 / 2 + 38 - 6 + 12, loStr, LEFT);
 #endif
     
 // daily forecast precipitation

@@ -164,6 +164,7 @@ class ConfigSchema(BaseModel):
     windDirectionLabel: WindDirectionLabel = WindDirectionLabel.WIND_HIDDEN
     windArrowPrecision: WindArrowPrecision = WindArrowPrecision.SECONDARY_INTERCARDINAL
     font: Font = Font.FREESANS
+    tempOrderHL: bool = False
     displayDailyPrecip: DisplayDailyPrecip = DisplayDailyPrecip.PRECIP_SMART
     displayHourlyIcons: bool = True
     displayAlerts: bool = True
