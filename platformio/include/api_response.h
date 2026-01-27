@@ -18,13 +18,6 @@
 #ifndef __API_RESPONSE_H__
 #define __API_RESPONSE_H__
 
-#include <cstdint>
-#include <vector>
-#include <Arduino.h>
-#include <ArduinoJson.h>
-#include <HTTPClient.h>
-#include <WiFi.h>
-
 #define OWM_NUM_HOURLY 48        // 48
 #define OWM_NUM_DAILY 8          // 8
 #define OWM_NUM_ALERTS 8         // OpenWeatherMaps does not specify a limit, but if you need more alerts you are probably doomed.

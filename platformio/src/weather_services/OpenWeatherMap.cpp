@@ -1,6 +1,7 @@
 #if WEATHER_API == OPEN_WEATHER_MAP
 
 #include "weather_service.h"
+
 #include "config.h"
 #include "_locale.h"
 

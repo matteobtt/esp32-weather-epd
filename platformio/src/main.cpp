@@ -15,21 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
-#include <Arduino.h>
-#include <Adafruit_Sensor.h>
 #include <Preferences.h>
-#include <time.h>
-#include <WiFi.h>
-#include <Wire.h>
 
 #include "_locale.h"
-#include "api_response.h"
 #include "client_utils.h"
-#include "config.h"
-#include "display_utils.h"
-#include "icons/icons_196x196.h"
 #include "renderer.h"
+#include "icons/icons_196x196.h"
+#include "display_utils.h"
 
 #if SENSOR == BME280
   #include <Adafruit_BME280.h>

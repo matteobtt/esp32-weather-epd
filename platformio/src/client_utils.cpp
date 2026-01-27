@@ -15,33 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-// built-in C++ libraries
-#include <cstring>
-#include <vector>
-
-// arduino/esp32 libraries
-#include <Arduino.h>
-#include <esp_sntp.h>
-#include <HTTPClient.h>
-#include <SPI.h>
-#include <time.h>
-#include <WiFi.h>
-
-// additional libraries
-#include <Adafruit_BusIO_Register.h>
-#include <ArduinoJson.h>
-
-// header files
-#include "_locale.h"
-#include "api_response.h"
-#include "aqi.h"
 #include "client_utils.h"
-#include "config.h"
-#include "display_utils.h"
-#include "icons/icons_196x196.h"
-#include "renderer.h"
+
+#include "_locale.h"
+#include <esp_sntp.h>
 #include "weather_service.h"
-#if HTTP_MODE == HTTP
+#include <HTTPClient.h>
+#include "display_utils.h"
+#include "renderer.h"
+#include "icons/icons_196x196.h"
+
+#if HTTP_MODE != HTTP
   #include <WiFiClientSecure.h>
 #endif
 

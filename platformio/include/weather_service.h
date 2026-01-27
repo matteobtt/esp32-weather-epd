@@ -18,9 +18,8 @@
 #ifndef __WEATHER_SERVICE_H__
 #define __WEATHER_SERVICE_H__
 
-#include <Arduino.h>
 #include <ArduinoJson.h>
-#include <WiFi.h>
+#include <WiFiClient.h>
 #include "api_response.h"
 
 #if HTTP_MODE == HTTPS_WITH_CERT_VERIF

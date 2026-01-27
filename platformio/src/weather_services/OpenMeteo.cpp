@@ -1,6 +1,7 @@
 #if WEATHER_API == OPEN_METEO
 
 #include "weather_service.h"
+
 #include "config.h"
 
 #if HTTP_MODE == HTTPS_WITH_CERT_VERIF

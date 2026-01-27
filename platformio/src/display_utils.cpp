@@ -15,22 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <cmath>
-#include <vector>
-#include <Arduino.h>
-#include <driver/adc.h>
-#include <esp_adc_cal.h>
-
-#include <aqi.h>
-
-#include "_locale.h"
-#include "_strftime.h"
-#include "api_response.h"
-#include "config.h"
 #include "display_utils.h"
-
-// icon header files
+      
+#include <esp_adc_cal.h>
 #include "icons/icons.h"
+#include "_strftime.h"
+#include "_locale.h"
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
 
 /* Returns battery voltage in millivolts (mv).
  */

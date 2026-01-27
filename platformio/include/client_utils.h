@@ -18,14 +18,8 @@
 #ifndef __CLIENT_UTILS_H__
 #define __CLIENT_UTILS_H__
 
-#include <Arduino.h>
+#include <WiFi.h>
 #include "api_response.h"
-#include "config.h"
-#if HTTP_MODE == HTTP
-  #include <WiFiClient.h>
-#else
-  #include <WiFiClientSecure.h>
-#endif
 
 wl_status_t startWiFi(int &wifiRSSI);
 void killWiFi();
