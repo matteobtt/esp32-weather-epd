@@ -1,5 +1,5 @@
-/* Client side utility declarations for esp32-weather-epd.
- * Copyright (C) 2022-2023  Luke Marzen
+/* Weather service specific declarations for esp32-weather-epd.
+ * Copyright (C) 2022-2025  Matteo Battistutta
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,26 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef __CLIENT_UTILS_H__
-#define __CLIENT_UTILS_H__
+#ifndef __WEATHER_SERVICE_H__
+#define __WEATHER_SERVICE_H__
 
 #include <Arduino.h>
+#include <ArduinoJson.h>
+#include <WiFi.h>
 #include "api_response.h"
-#include "config.h"
-#if HTTP_MODE == HTTP
-  #include <WiFiClient.h>
-#else
-  #include <WiFiClientSecure.h>
+
+#if HTTP_MODE == HTTPS_WITH_CERT_VERIF
+extern const char* TLS_CERT;
 #endif
 
-wl_status_t startWiFi(int &wifiRSSI);
-void killWiFi();
-bool waitForSNTPSync(tm *timeInfo);
-bool printLocalTime(tm *timeInfo);
+extern const String SERVICE_NAME;
 
-bool makeAPICalls(owm_resp_onecall_t &resp_main, owm_resp_air_pollution_t &resp_pollution);
-
-int getMainData(WiFiClient &client, owm_resp_onecall_t &r);
-int getPollutionData(WiFiClient &client, owm_resp_air_pollution_t &r);
+String buildURL();
+String buildSanitizedURL(String url);
+DeserializationError deserializeMainCall(WiFiClient &json,
+                                        owm_resp_onecall_t &r);
+DeserializationError deserializeAirQuality(WiFiClient &json,
+                                           owm_resp_air_pollution_t &r);
 
 #endif

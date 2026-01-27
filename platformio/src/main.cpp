@@ -36,12 +36,6 @@
 #elif SENSOR == BME680
   #include <Adafruit_BME680.h>
 #endif
-#if HTTP_MODE != HTTP
-  #include <WiFiClientSecure.h>
-#endif
-#if HTTP_MODE == HTTPS_WITH_CERT_VERIF
-  #include "cert.h"
-#endif
 
 // too large to allocate locally on stack
 static owm_resp_onecall_t owm_onecall;
@@ -118,10 +112,8 @@ void beginDeepSleep(unsigned long startTime, tm *timeInfo)
   esp_deep_sleep_start();
 } // end beginDeepSleep
 
-bool getWeatherData(int &wifiRSSI, tm *timeInfo) {
-  String errorStr = {};
-  String tmpStr = {};
-
+/* Setup Wi-Fi and time */
+bool setupWifi(int &wifiRSSI, tm *timeInfo) {
   // START WIFI
   wl_status_t wifiStatus = startWiFi(wifiRSSI);
   if (wifiStatus != WL_CONNECTED)
@@ -148,58 +140,8 @@ bool getWeatherData(int &wifiRSSI, tm *timeInfo) {
     return false;
   }
 
-  // MAKE API REQUESTS
-#if HTTP_MODE == HTTP
-  WiFiClient client;
-#elif HTTP_MODE == HTTPS_NO_CERT_VERIF
-  WiFiClientSecure client;
-  client.setInsecure();
-#elif HTTP_MODE == HTTPS_WITH_CERT_VERIF
-  WiFiClientSecure client;
-  if (WEATHER_API == OPEN_WEATHER_MAP)
-  {
-    client.setCACert(cert_USERTrust_RSA_Certification_Authority);
-  }
-  else if (WEATHER_API == OPEN_METEO)
-  {
-    client.setCACert(cert_ISRG_Root_X1);
-  }
-#endif
-
-  if (WEATHER_API == OPEN_WEATHER_MAP)
-  {
-    int rxStatus = getOWMonecall(client, owm_onecall);
-    if (rxStatus != HTTP_CODE_OK)
-    {
-      errorStr = "One Call " + OWM_ONECALL_VERSION + " API";
-      tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
-      drawError(wi_cloud_down_196x196, errorStr, tmpStr);
-      return false;
-    }
-
-    rxStatus = getOWMairpollution(client, owm_air_pollution);
-    if (rxStatus != HTTP_CODE_OK)
-    {
-      errorStr = "Air Pollution API";
-      tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
-      drawError(wi_cloud_down_196x196, errorStr, tmpStr);
-      return false;
-    }
-  }
-  else if (WEATHER_API == OPEN_METEO)
-  {
-    int rxStatus = getOMCall(client, owm_onecall);
-    if (rxStatus != HTTP_CODE_OK)
-    {
-      errorStr = "Open Meteo API";
-      tmpStr = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
-      drawError(wi_cloud_down_196x196, errorStr, tmpStr);
-      return false;
-    }
-  }
-
   return true;
-}
+} // end setupWifi
 
 /* Program entry point.
  */
@@ -326,7 +268,10 @@ void setup()
 
   int wifiRSSI = 0; // “Received Signal Strength Indicator"
 
-  bool dataSuccess = getWeatherData(wifiRSSI, &timeInfo);
+  bool dataSuccess = setupWifi(wifiRSSI, &timeInfo);
+  if (dataSuccess) {
+    dataSuccess = makeAPICalls(owm_onecall, owm_air_pollution);
+  }
 
   killWiFi(); // WiFi no longer needed
 

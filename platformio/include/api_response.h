@@ -145,11 +145,4 @@ typedef struct owm_resp_air_pollution
   owm_components_t components;
 } owm_resp_air_pollution_t;
 
-DeserializationError deserializeOneCall(WiFiClient &json,
-                                        owm_resp_onecall_t &r);
-DeserializationError deserializeAirQuality(WiFiClient &json,
-                                           owm_resp_air_pollution_t &r);
-DeserializationError deserializeOpenMeteoCall(WiFiClient &json,
-                                              owm_resp_onecall_t &r);
-
 #endif

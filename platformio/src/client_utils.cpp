@@ -38,13 +38,15 @@
 #include "client_utils.h"
 #include "config.h"
 #include "display_utils.h"
+#include "icons/icons_196x196.h"
 #include "renderer.h"
+#include "weather_service.h"
 #if HTTP_MODE == HTTP
   #include <WiFiClientSecure.h>
 #endif
 
 #if HTTP_MODE == HTTP
-  static const uint16_t OWM_PORT = 80;
+  static const uint16_t PORT = 80;
 #else
   static const uint16_t PORT = 443;
 #endif
@@ -135,35 +137,65 @@ bool waitForSNTPSync(tm *timeInfo)
   return printLocalTime(timeInfo);
 } // waitForSNTPSync
 
-/* Perform an HTTP GET request to OpenWeatherMap's "One Call" API
+/* Perform the API calls
+ * Returns true if succeeded
+*/
+bool makeAPICalls(owm_resp_onecall_t &resp_main, owm_resp_air_pollution_t &resp_pollution) {
+  String serviceName = {};
+  String errorMsg = {};
+
+#if HTTP_MODE == HTTP
+  WiFiClient client;
+#elif HTTP_MODE == HTTPS_NO_CERT_VERIF
+  WiFiClientSecure client;
+  client.setInsecure();
+#elif HTTP_MODE == HTTPS_WITH_CERT_VERIF
+  WiFiClientSecure client;
+  client.setCACert(TLS_CERT);
+#endif
+
+  int rxStatus = getMainData(client, resp_main);
+  if (rxStatus != HTTP_CODE_OK)
+  {
+    serviceName = SERVICE_NAME;
+    errorMsg = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
+    drawError(wi_cloud_down_196x196, serviceName, errorMsg);
+    return false;
+  }
+
+  rxStatus = getPollutionData(client, resp_pollution);
+  if (rxStatus != HTTP_CODE_OK)
+  {
+    serviceName = "Air Pollution API";
+    errorMsg = String(rxStatus, DEC) + ": " + getHttpResponsePhrase(rxStatus);
+    drawError(wi_cloud_down_196x196, serviceName, errorMsg);
+    return false;
+  }
+
+  return true;
+}
+
+/* Perform an HTTP GET request to the main weather API
  * If data is received, it will be parsed and stored in the global variable
  * owm_onecall.
  *
  * Returns the HTTP Status Code.
  */
-#if HTTP_MODE == HTTP
-  int getOWMonecall(WiFiClient &client, owm_resp_onecall_t &r)
-#else
-  int getOWMonecall(WiFiClientSecure &client, owm_resp_onecall_t &r)
-#endif
+int getMainData(WiFiClient &client, owm_resp_onecall_t &r)
 {
   int attempts = 0;
   bool rxSuccess = false;
   DeserializationError jsonErr = {};
-  String uri = "/data/" + OWM_ONECALL_VERSION + "/onecall?lat=" + LAT + "&lon=" + LON + "&lang=" + OWM_LANG + "&units=metric&exclude=minutely";
-#if !DISPLAY_ALERTS
-  // exclude alerts
-  uri += ",alerts";
-#endif
+  String url = buildURL();
 
   // This string is printed to terminal to help with debugging. The API key is
   // censored to reduce the risk of users exposing their key.
-  String sanitizedUri = OWM_ENDPOINT + uri + "&appid={API key}";
+  String sanitizedUrl = buildSanitizedURL(url);
 
-  uri += "&appid=" + OWM_APIKEY;
+  url += "&appid=" + OWM_APIKEY;
 
   Serial.print(TXT_ATTEMPTING_HTTP_REQ);
-  Serial.println(": " + sanitizedUri);
+  Serial.println(": " + sanitizedUrl);
   int httpResponse = 0;
   while (!rxSuccess && attempts < 3)
   {
@@ -177,11 +209,12 @@ bool waitForSNTPSync(tm *timeInfo)
     HTTPClient http;
     http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
     http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
-    http.begin(client, OWM_ENDPOINT, PORT, uri);
+    http.useHTTP10(true);
+    http.begin(client, OWM_ENDPOINT, PORT, url);
     httpResponse = http.GET();
     if (httpResponse == HTTP_CODE_OK)
     {
-      jsonErr = deserializeOneCall(http.getStream(), r);
+      jsonErr = deserializeMainCall(http.getStream(), r);
       if (jsonErr)
       {
         // -256 offset distinguishes these errors from httpClient errors
@@ -196,19 +229,15 @@ bool waitForSNTPSync(tm *timeInfo)
   }
 
   return httpResponse;
-} // getOWMonecall
+} // getMainData
 
-/* Perform an HTTP GET request to OpenWeatherMap's "Air Pollution" API
+/* Perform an HTTP GET request to get the air quality
  * If data is received, it will be parsed and stored in the global variable
  * owm_air_pollution.
  *
  * Returns the HTTP Status Code.
  */
-#if HTTP_MODE == HTTP
-  int getOWMairpollution(WiFiClient &client, owm_resp_air_pollution_t &r)
-#else
-  int getOWMairpollution(WiFiClientSecure &client, owm_resp_air_pollution_t &r)
-#endif
+int getPollutionData(WiFiClient &client, owm_resp_air_pollution_t &r)
 {
   int attempts = 0;
   bool rxSuccess = false;
@@ -264,74 +293,7 @@ bool waitForSNTPSync(tm *timeInfo)
   }
 
   return httpResponse;
-} // getOWMairpollution
-
-/* Perform an HTTP GET request to OpenMeteo's API
- * If data is received, it will be parsed and stored in the global variable
- * om_call.
- *
- * Returns the HTTP Status Code.
- */
-#if HTTP_MODE == HTTP
-int getOMCall(WiFiClient &client, owm_resp_onecall_t &r)
-#else
-int getOMCall(WiFiClientSecure &client, owm_resp_onecall_t &r)
-#endif
-{
-  int attempts = 0;
-  bool rxSuccess = false;
-  DeserializationError jsonErr = {};
-
-  String uri = "/v1/forecast?latitude=" + LAT + "&longitude=" + LON + "&" +
-               "current=temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,weather_code,cloud_cover,visibility,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,is_day&" +
-               "hourly=temperature_2m,cloud_cover,wind_speed_10m,wind_gusts_10m,precipitation_probability,rain,snowfall,weather_code,is_day&" +
-               "daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,rain_sum,snowfall_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max&" +
-               "wind_speed_unit=ms&timezone=auto&timeformat=unixtime&forecast_days=5&forecast_hours=" + HOURLY_GRAPH_MAX;
-
-#if !DISPLAY_ALERTS
-  // exclude alerts
-  // uri += ",alerts";
-#endif
-
-  // This string is printed to terminal to help with debugging.
-  String sanitizedUri = OM_ENDPOINT + uri;
-
-  Serial.print(TXT_ATTEMPTING_HTTP_REQ);
-  Serial.println(": " + sanitizedUri);
-  int httpResponse = 0;
-  while (!rxSuccess && attempts < 3)
-  {
-    wl_status_t connection_status = WiFi.status();
-    if (connection_status != WL_CONNECTED)
-    {
-      // -512 offset distinguishes these errors from httpClient errors
-      return -512 - static_cast<int>(connection_status);
-    }
-
-    HTTPClient http;
-    http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
-    http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
-    http.useHTTP10(true);
-    http.begin(client, OM_ENDPOINT, PORT, uri);
-    httpResponse = http.GET();
-    if (httpResponse == HTTP_CODE_OK)
-    {
-      jsonErr = deserializeOpenMeteoCall(http.getStream(), r); // Convert String to const char*
-      if (jsonErr)
-      {
-        // -256 offset distinguishes these errors from httpClient errors
-        httpResponse = -256 - static_cast<int>(jsonErr.code());
-      }
-      rxSuccess = !jsonErr;
-    }
-    client.stop();
-    http.end();
-    Serial.println("  " + String(httpResponse, DEC) + " " + getHttpResponsePhrase(httpResponse));
-    ++attempts;
-  }
-
-  return httpResponse;
-} // getOMcall
+} // getPollutionData
 
 /* Prints debug information about heap usage.
  */
