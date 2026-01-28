@@ -13,7 +13,10 @@ const char* TLS_CERT = cert_USERTrust_RSA_Certification_Authority;
 
 const String SERVICE_NAME = "One Call " + OWM_ONECALL_VERSION + " API";
 
-String buildURL() {
+const char* DOMAIN_MAIN = "api.openweathermap.org";
+const char* DOMAIN_POLLUTION = ENDPOINT_MAIN;
+
+String buildMainURL() {
   String url = "/data/" + OWM_ONECALL_VERSION + "/onecall?lat=" + LAT + "&lon=" + LON + "&lang=" + OWM_LANG + "&units=metric&exclude=minutely";
 #if !DISPLAY_ALERTS
   // exclude alerts
@@ -23,8 +26,12 @@ String buildURL() {
   return url;
 }
 
+String buildPollutionURL(char* startStr, char* endStr) {
+  return "/data/2.5/air_pollution/history?lat=" + LAT + "&lon=" + LON + "&start=" + startStr + "&end=" + endStr + "&appid=" + OWM_APIKEY;
+}
+
 String buildSanitizedURL(String url) {
-  return OWM_ENDPOINT + url + "&appid={API key}";
+  return url + "&appid={API key}";
 }
 
 DeserializationError deserializeMainCall(WiFiClient &json,

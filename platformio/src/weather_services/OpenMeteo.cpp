@@ -12,7 +12,10 @@ const char* TLS_CERT = cert_ISRG_Root_X1;
 
 const String SERVICE_NAME = "Open Meteo API";
 
-String buildURL() {
+const char* DOMAIN_MAIN = "api.open-meteo.com";
+const char* DOMAIN_POLLUTION = "air-quality-api.open-meteo.com";
+
+String buildMainURL() {
   return  "/v1/forecast?latitude=" + LAT + "&longitude=" + LON + "&" +
           "current=temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,weather_code,cloud_cover,visibility,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,is_day&" +
           "hourly=temperature_2m,cloud_cover,wind_speed_10m,wind_gusts_10m,precipitation_probability,rain,snowfall,weather_code,is_day&" +
@@ -20,8 +23,15 @@ String buildURL() {
           "wind_speed_unit=ms&timezone=auto&timeformat=unixtime&forecast_days=5&forecast_hours=" + HOURLY_GRAPH_MAX;
 }
 
+String buildPollutionURL(char* startStr, char* endStr) {
+  return  "/v1/air-quality?latitude=" + LAT + "&longitude=" + LON + "&" +
+          "hourly=pm10,pm2_5,carbon_monoxide,ammonia,sulphur_dioxide,ozone,nitrogen_dioxide&" +
+          "past_hours=" + OWM_NUM_AIR_POLLUTION + "&" + 
+          "forecast_hours=0&timeformat=unixtime";
+}
+
 String buildSanitizedURL(String url) {
-  return OWM_ENDPOINT + url;
+  return url;
 }
 
 DeserializationError deserializeMainCall(WiFiClient &json,
@@ -130,5 +140,45 @@ DeserializationError deserializeMainCall(WiFiClient &json,
 
   return error;
 } // end deserializeOpenMeteoCall
+
+DeserializationError deserializeAirQuality(WiFiClient &json,
+                                           owm_resp_air_pollution_t &r)
+{
+  JsonDocument doc;
+
+  DeserializationError error = deserializeJson(doc, json);
+#if DEBUG_LEVEL >= 1
+  Serial.println("[debug] doc.overflowed() : " + String(doc.overflowed()));
+  #endif
+#if DEBUG_LEVEL >= 2
+  serializeJsonPretty(doc, Serial);
+#endif
+  if (error)
+  {
+    return error;
+  }
+
+  JsonObject hourly = doc["hourly"];
+
+  int hours = doc["hourly"]["time"].size();
+  for (size_t i = 0; i < hours; i++)
+  {
+    r.components.co[i] = hourly["carbon_monoxide"][i].as<float>();
+    r.components.no2[i] = hourly["nitrogen_dioxide"][i].as<float>();
+    r.components.o3[i] = hourly["ozone"][i].as<float>();
+    r.components.so2[i] = hourly["sulphur_dioxide"][i].as<float>();
+    r.components.pm2_5[i] = hourly["pm2_5"][i].as<float>();
+    r.components.pm10[i] = hourly["pm10"][i].as<float>();
+    r.components.nh3[i] = hourly["ammonia"][i].as<float>();
+
+    if (i == OWM_NUM_AIR_POLLUTION - 1)
+    {
+      break;
+    }
+    ++i;
+  }
+
+  return error;
+} // end deserializeAirQuality
 
 #endif

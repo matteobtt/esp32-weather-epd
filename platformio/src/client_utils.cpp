@@ -147,6 +147,7 @@ bool makeAPICalls(owm_resp_onecall_t &resp_main, owm_resp_air_pollution_t &resp_
     return false;
   }
 
+#ifdef POS_AIR_QUALITY
   rxStatus = getPollutionData(client, resp_pollution);
   if (rxStatus != HTTP_CODE_OK)
   {
@@ -155,6 +156,7 @@ bool makeAPICalls(owm_resp_onecall_t &resp_main, owm_resp_air_pollution_t &resp_
     drawError(wi_cloud_down_196x196, serviceName, errorMsg);
     return false;
   }
+#endif
 
   return true;
 }
@@ -170,11 +172,11 @@ int getMainData(WiFiClient &client, owm_resp_onecall_t &r)
   int attempts = 0;
   bool rxSuccess = false;
   DeserializationError jsonErr = {};
-  String url = buildURL();
+  String url = buildMainURL();
 
   // This string is printed to terminal to help with debugging. The API key is
   // censored to reduce the risk of users exposing their key.
-  String sanitizedUrl = buildSanitizedURL(url);
+  String sanitizedUrl = buildSanitizedURL(DOMAIN_MAIN + url);
 
   url += "&appid=" + OWM_APIKEY;
 
@@ -194,7 +196,7 @@ int getMainData(WiFiClient &client, owm_resp_onecall_t &r)
     http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
     http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
     http.useHTTP10(true);
-    http.begin(client, OWM_ENDPOINT, PORT, url);
+    http.begin(client, DOMAIN_MAIN, PORT, url);
     httpResponse = http.GET();
     if (httpResponse == HTTP_CODE_OK)
     {
@@ -237,14 +239,13 @@ int getPollutionData(WiFiClient &client, owm_resp_air_pollution_t &r)
   char startStr[22];
   sprintf(endStr, "%lld", end);
   sprintf(startStr, "%lld", start);
-  String uri = "/data/2.5/air_pollution/history?lat=" + LAT + "&lon=" + LON + "&start=" + startStr + "&end=" + endStr + "&appid=" + OWM_APIKEY;
+  String url = buildPollutionURL(startStr, endStr);
   // This string is printed to terminal to help with debugging. The API key is
   // censored to reduce the risk of users exposing their key.
-  String sanitizedUri = OWM_ENDPOINT +
-                        "/data/2.5/air_pollution/history?lat=" + LAT + "&lon=" + LON + "&start=" + startStr + "&end=" + endStr + "&appid={API key}";
+  String sanitizedUrl = buildSanitizedURL(DOMAIN_POLLUTION + url);
 
   Serial.print(TXT_ATTEMPTING_HTTP_REQ);
-  Serial.println(": " + sanitizedUri);
+  Serial.println(": " + sanitizedUrl);
   int httpResponse = 0;
   while (!rxSuccess && attempts < 3)
   {
@@ -258,7 +259,8 @@ int getPollutionData(WiFiClient &client, owm_resp_air_pollution_t &r)
     HTTPClient http;
     http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
     http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
-    http.begin(client, OWM_ENDPOINT, PORT, uri);
+    http.useHTTP10(true);
+    http.begin(client, DOMAIN_POLLUTION, PORT, url);
     httpResponse = http.GET();
     if (httpResponse == HTTP_CODE_OK)
     {

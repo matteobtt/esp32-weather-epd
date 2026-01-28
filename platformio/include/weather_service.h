@@ -28,7 +28,11 @@ extern const char* TLS_CERT;
 
 extern const String SERVICE_NAME;
 
-String buildURL();
+extern const char* DOMAIN_MAIN;
+extern const char* DOMAIN_POLLUTION;
+
+String buildMainURL();
+String buildPollutionURL(char* startStr, char* endStr);
 String buildSanitizedURL(String url);
 DeserializationError deserializeMainCall(WiFiClient &json,
                                         owm_resp_onecall_t &r);

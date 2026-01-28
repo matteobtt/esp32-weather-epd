@@ -15,7 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
 #include "config.h"
 
 // WIFI
@@ -48,14 +47,6 @@ const String OWM_APIKEY = D_OWM_APIKEY;
 //   day (no more than)" to 1,000. This ensures you will never overrun the free
 //   calls.
 const String OWM_ONECALL_VERSION = D_OWM_ONECALL_VERSION;
-
-// OPENWEATHERMAP API
-// OpenWeatherMap API key, https://openweathermap.org/
-const String OWM_ENDPOINT = "api.openweathermap.org";
-
-// OPENMETEO API
-// Open Meteo API, https://open-meteo.com/
-const String OM_ENDPOINT = "api.open-meteo.com";
 
 // LOCATION
 // Set your latitude and longitude.

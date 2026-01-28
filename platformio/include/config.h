@@ -18,7 +18,6 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#include <cstdint>
 #include <Arduino.h>
 
 // DEFAULT CONFIGS
@@ -58,9 +57,7 @@ extern const char *WIFI_SSID;
 extern const unsigned long WIFI_TIMEOUT;
 extern const unsigned HTTP_CLIENT_TCP_TIMEOUT;
 extern const String OWM_APIKEY;
-extern const String OWM_ENDPOINT;
 extern const String OWM_ONECALL_VERSION;
-extern const String OM_ENDPOINT;
 extern const String LAT;
 extern const String LON;
 extern const String CITY_STRING;
