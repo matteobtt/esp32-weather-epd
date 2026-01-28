@@ -170,12 +170,6 @@ DeserializationError deserializeAirQuality(WiFiClient &json,
     r.components.pm2_5[i] = hourly["pm2_5"][i].as<float>();
     r.components.pm10[i] = hourly["pm10"][i].as<float>();
     r.components.nh3[i] = hourly["ammonia"][i].as<float>();
-
-    if (i == OWM_NUM_AIR_POLLUTION - 1)
-    {
-      break;
-    }
-    ++i;
   }
 
   return error;
