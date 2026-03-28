@@ -19,7 +19,7 @@ String buildMainURL() {
   return  "/v1/forecast?latitude=" + LAT + "&longitude=" + LON + "&" +
           "current=temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,weather_code,cloud_cover,visibility,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,is_day&" +
           "hourly=temperature_2m,cloud_cover,wind_speed_10m,wind_gusts_10m,precipitation_probability,rain,snowfall,weather_code,is_day&" +
-          "daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,rain_sum,snowfall_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max&" +
+          "daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,rain_sum,snowfall_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,cloud_cover_mean&" +
           "wind_speed_unit=ms&timezone=auto&timeformat=unixtime&forecast_days=5&forecast_hours=" + HOURLY_GRAPH_MAX;
 }
 
@@ -103,8 +103,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
     // r.daily[i].moon_phase = daily["moon_phase"].as<float>();
     r.daily[i].temp.min = daily["temperature_2m_min"][i].as<float>();
     r.daily[i].temp.max = daily["temperature_2m_max"][i].as<float>();
-    // Cloud cover percentage is not provided by Open-Meteo as daily
-    // r.daily[i].clouds = daily["cloud_cover"][i].as<int>();
+    r.daily[i].clouds = daily["cloud_cover_mean"][i].as<int>();
     r.daily[i].wind_speed = daily["wind_speed_10m_max"][i].as<float>();
     r.daily[i].wind_gust = daily["wind_gusts_10m_max"][i].as<float>();
     r.daily[i].pop = daily["precipitation_probability_max"][i].as<int>();
