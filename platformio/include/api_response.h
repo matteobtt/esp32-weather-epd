@@ -23,11 +23,6 @@
 #define OWM_NUM_ALERTS 8         // OpenWeatherMaps does not specify a limit, but if you need more alerts you are probably doomed.
 #define OWM_NUM_AIR_POLLUTION 24 // Depending on AQI scale, hourly concentrations will need to be averaged over a period of 1h to 24h
 
-typedef struct owm_weather
-{
-  int id;             // Weather condition id
-} owm_weather_t;
-
 /*
  * Units – default: kelvin, metric: Celsius, imperial: Fahrenheit.
  */
@@ -57,7 +52,7 @@ typedef struct owm_current
   float wind_gust;  // (where available) Wind gust. Units – default: metre/sec, metric: metre/sec, imperial: miles/hour.
   int wind_deg;     // Wind direction, degrees (meteorological)
   bool is_day;      // Is set to true if the sun is currently up
-  owm_weather_t weather;
+  uint8_t id;       // Weather condition id
 } owm_current_t;
 
 /*
@@ -71,9 +66,9 @@ typedef struct owm_hourly
   float wind_speed; // Wind speed. Wind speed. Units – default: metre/sec, metric: metre/sec, imperial: miles/hour.
   float wind_gust;  // (where available) Wind gust. Units – default: metre/sec, metric: metre/sec, imperial: miles/hour.
   int pop;          // Probability of precipitation, %
-  float precip_1h;    // (where available) Precipitation volume for last hour, mm
+  float precip_1h;  // (where available) Precipitation volume for last hour, mm
   bool is_day;      // Is set to true if the sun is up at the time
-  owm_weather_t weather;
+  int id;           // Weather condition id
 } owm_hourly_t;
 
 /*
@@ -90,8 +85,8 @@ typedef struct owm_daily
   float wind_speed; // Wind speed. Wind speed. Units – default: metre/sec, metric: metre/sec, imperial: miles/hour.
   float wind_gust;  // (where available) Wind gust. Units – default: metre/sec, metric: metre/sec, imperial: miles/hour.
   int pop;          // Probability of precipitation, %
-  float precip;       // (where available) Precipitation volume, mm
-  owm_weather_t weather;
+  float precip;     // (where available) Precipitation volume, mm
+  int id;           // Weather condition id
 } owm_daily_t;
 
 /*

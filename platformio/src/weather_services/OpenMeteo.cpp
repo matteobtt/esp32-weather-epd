@@ -109,7 +109,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
   r.current.wind_speed = current["wind_speed_10m"].as<float>();
   r.current.wind_gust = current["wind_gusts_10m"].as<float>();
   r.current.wind_deg = current["wind_direction_10m"].as<int>(); // w
-  r.current.weather.id = current["weather_code"].as<int>();
+  r.current.id = current["weather_code"].as<int>();
   r.current.is_day = current["is_day"].as<bool>();
 
   int hours = doc["hourly"]["time"].size();
@@ -122,7 +122,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
     r.hourly[i].wind_gust = hourly["wind_gusts_10m"][i].as<float>();
     r.hourly[i].pop = hourly["precipitation_probability"][i].as<int>();
     r.hourly[i].precip_1h = hourly["precipitation"][i].as<float>();
-    r.hourly[i].weather.id = hourly["weather_code"][i].as<int>();
+    r.hourly[i].id = hourly["weather_code"][i].as<int>();
     r.hourly[i].is_day = hourly["is_day"][i].as<bool>();
 
     if (i == OWM_NUM_HOURLY - 1)
@@ -146,7 +146,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
     r.daily[i].wind_gust = daily["wind_gusts_10m_max"][i].as<float>();
     r.daily[i].pop = daily["precipitation_probability_max"][i].as<int>();
     r.daily[i].precip = daily["precipitation_sum"][i].as<float>();
-    r.daily[i].weather.id = daily["weather_code"][i].as<int>();
+    r.daily[i].id = daily["weather_code"][i].as<int>();
 
     if (i == OWM_NUM_DAILY - 1)
     {

@@ -974,7 +974,7 @@ const uint8_t *getConditionsBitmap(int id, bool day, bool moon, bool cloudy,
 const uint8_t *getHourlyForecastBitmap32(const owm_hourly_t &hourly,
                                          const owm_daily_t &today)
 {
-  const int id = hourly.weather.id;
+  const int id = hourly.id;
   const bool day = hourly.is_day;
   const bool moon = isMoonInSky(hourly.dt, today.moonrise, today.moonset,
                                 today.moon_phase);
@@ -988,7 +988,7 @@ const uint8_t *getHourlyForecastBitmap32(const owm_hourly_t &hourly,
  */
 const uint8_t *getDailyForecastBitmap64(const owm_daily_t &daily)
 {
-  const int id = daily.weather.id;
+  const int id = daily.id;
   // always show daytime icon for daily forecast
   const bool day = true;
   const bool moon = false;
@@ -1006,7 +1006,7 @@ const uint8_t *getDailyForecastBitmap64(const owm_daily_t &daily)
 const uint8_t *getCurrentConditionsBitmap196(const owm_current_t &current,
                                              const owm_daily_t &today)
 {
-  const int id = current.weather.id;
+  const int id = current.id;
   const bool day = current.is_day;
   const bool moon = isMoonInSky(current.dt, today.moonrise, today.moonset,
                                 today.moon_phase);

@@ -91,7 +91,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
   r.current.wind_gust = current["wind_gust"].as<float>();
   r.current.wind_deg = current["wind_deg"].as<int>();
   JsonObject current_weather = current["weather"][0];
-  r.current.weather.id = current_weather["id"].as<int>();
+  r.current.id = current_weather["id"].as<int>();
   // OpenWeatherMap indicates sun is up with d otherwise n for night
   r.current.is_day = current_weather["icon"].as<String>().endsWith("d");
 
@@ -106,7 +106,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
     r.hourly[i].pop = hourly["pop"].as<float>() * 100;
     r.hourly[i].precip_1h = hourly["rain"]["1h"].as<float>() + hourly["snow"]["1h"].as<float>();
     JsonObject hourly_weather = hourly["weather"][0];
-    r.hourly[i].weather.id = hourly_weather["id"].as<int>();
+    r.hourly[i].id = hourly_weather["id"].as<int>();
     // OpenWeatherMap indicates sun is up with d otherwise n for night
     r.hourly[i].is_day = hourly_weather["icon"].as<String>().endsWith("d");
 
@@ -133,7 +133,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
     r.daily[i].pop = daily["pop"].as<float>() * 100;
     r.daily[i].precip = daily["rain"].as<float>() + daily["snow"].as<float>();
     JsonObject daily_weather = daily["weather"][0];
-    r.daily[i].weather.id = daily_weather["id"].as<int>();
+    r.daily[i].id = daily_weather["id"].as<int>();
 
     if (i == OWM_NUM_DAILY - 1)
     {
