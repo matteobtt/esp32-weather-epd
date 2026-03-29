@@ -1062,7 +1062,7 @@ void drawForecast(const owm_daily_t *daily, tm timeInfo)
     dataStr = String(static_cast<int>(dailyPrecip));
     unitStr = "%";
 #else
-    dailyPrecip = daily[i].snow + daily[i].rain;
+    dailyPrecip = daily[i].precip;
 #if UNITS_DAILY_PRECIP == MILLIMETERS
     // Round up to nearest mm
     dailyPrecip = std::round(dailyPrecip);
@@ -1275,7 +1275,7 @@ void drawOutlookGraph(const owm_hourly_t *hourly, const owm_daily_t *daily,
 #if UNITS_HOURLY_PRECIP == POP
   float precipMax = hourly[0].pop;
 #else
-  float precipMax = hourly[0].rain_1h + hourly[0].snow_1h;
+  float precipMax = hourly[0].precip_1h;
 #endif
   int yTempMajorTicks = 5;
   float newTemp = 0;
@@ -1294,7 +1294,7 @@ void drawOutlookGraph(const owm_hourly_t *hourly, const owm_daily_t *daily,
     precipMax = std::max<float>(precipMax, hourly[i].pop);
 #else
     precipMax = std::max<float>(
-                precipMax, hourly[i].rain_1h + hourly[i].snow_1h);
+                precipMax, hourly[i].precip_1h);
 #endif
   }
   int tempBoundMin = static_cast<int>(tempMin - 1) - modulo(static_cast<int>(tempMin - 1), yTempMajorTicks);
@@ -1522,7 +1522,7 @@ void drawOutlookGraph(const owm_hourly_t *hourly, const owm_daily_t *daily,
 #if UNITS_HOURLY_PRECIP == POP
     float precipVal = hourly[i].pop;
 #else
-    float precipVal = hourly[i].rain_1h + hourly[i].snow_1h;
+    float precipVal = hourly[i].precip_1h;
 #if UNITS_HOURLY_PRECIP == CENTIMETERS
     precipVal = millimeters_to_centimeters(precipVal);
 #elif UNITS_HOURLY_PRECIP == INCHES

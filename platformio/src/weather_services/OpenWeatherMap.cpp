@@ -104,8 +104,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
     r.hourly[i].wind_speed = hourly["wind_speed"].as<float>();
     r.hourly[i].wind_gust = hourly["wind_gust"].as<float>();
     r.hourly[i].pop = hourly["pop"].as<float>() * 100;
-    r.hourly[i].rain_1h = hourly["rain"]["1h"].as<float>();
-    r.hourly[i].snow_1h = hourly["snow"]["1h"].as<float>();
+    r.hourly[i].precip_1h = hourly["rain"]["1h"].as<float>() + hourly["snow"]["1h"].as<float>();
     JsonObject hourly_weather = hourly["weather"][0];
     r.hourly[i].weather.id = hourly_weather["id"].as<int>();
     // OpenWeatherMap indicates sun is up with d otherwise n for night
@@ -132,8 +131,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
     r.daily[i].wind_speed = daily["wind_speed"].as<float>();
     r.daily[i].wind_gust = daily["wind_gust"].as<float>();
     r.daily[i].pop = daily["pop"].as<float>() * 100;
-    r.daily[i].rain = daily["rain"].as<float>();
-    r.daily[i].snow = daily["snow"].as<float>();
+    r.daily[i].precip = daily["rain"].as<float>() + daily["snow"].as<float>();
     JsonObject daily_weather = daily["weather"][0];
     r.daily[i].weather.id = daily_weather["id"].as<int>();
 

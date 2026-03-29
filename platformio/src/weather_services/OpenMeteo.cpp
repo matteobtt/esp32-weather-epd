@@ -41,14 +41,14 @@ String buildMainURL() {
 #if UNITS_HOURLY_PRECIP == POP
           ",precipitation_probability" +
 #else
-          ",rain,snowfall" +
+          ",precipitation" +
 #endif
 
           "&daily=weather_code,cloud_cover_mean,wind_speed_10m_max,wind_gusts_10m_max,temperature_2m_max,temperature_2m_min" +
 #if UNITS_DAILY_PRECIP == POP
           ",precipitation_probability_max" +
 #else
-          ",rain_sum,snowfall_sum" +
+          ",precipitation_sum" +
 #endif
 #ifdef POS_SUNRISE
           ",sunrise" +
@@ -121,8 +121,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
     r.hourly[i].wind_speed = hourly["wind_speed_10m"][i].as<float>();
     r.hourly[i].wind_gust = hourly["wind_gusts_10m"][i].as<float>();
     r.hourly[i].pop = hourly["precipitation_probability"][i].as<int>();
-    r.hourly[i].rain_1h = hourly["rain"][i].as<float>();
-    r.hourly[i].snow_1h = hourly["snowfall"][i].as<float>();
+    r.hourly[i].precip_1h = hourly["precipitation"][i].as<float>();
     r.hourly[i].weather.id = hourly["weather_code"][i].as<int>();
     r.hourly[i].is_day = hourly["is_day"][i].as<bool>();
 
@@ -146,8 +145,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
     r.daily[i].wind_speed = daily["wind_speed_10m_max"][i].as<float>();
     r.daily[i].wind_gust = daily["wind_gusts_10m_max"][i].as<float>();
     r.daily[i].pop = daily["precipitation_probability_max"][i].as<int>();
-    r.daily[i].rain = daily["rain_sum"][i].as<float>();
-    r.daily[i].snow = daily["snowfall_sum"][i].as<float>();
+    r.daily[i].precip = daily["precipitation_sum"][i].as<float>();
     r.daily[i].weather.id = daily["weather_code"][i].as<int>();
 
     if (i == OWM_NUM_DAILY - 1)
