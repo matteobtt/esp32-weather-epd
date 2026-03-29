@@ -16,11 +16,50 @@ const char* DOMAIN_MAIN = "api.open-meteo.com";
 const char* DOMAIN_POLLUTION = "air-quality-api.open-meteo.com";
 
 String buildMainURL() {
-  return  "/v1/forecast?latitude=" + LAT + "&longitude=" + LON + "&" +
-          "current=temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,weather_code,cloud_cover,visibility,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m,is_day&" +
-          "hourly=temperature_2m,cloud_cover,wind_speed_10m,wind_gusts_10m,precipitation_probability,rain,snowfall,weather_code,is_day&" +
-          "daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,uv_index_max,rain_sum,snowfall_sum,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,cloud_cover_mean&" +
-          "wind_speed_unit=ms&timezone=auto&timeformat=unixtime&forecast_days=5&forecast_hours=" + HOURLY_GRAPH_MAX;
+  return  "/v1/forecast?latitude=" + LAT + "&longitude=" + LON +
+          "&current=temperature_2m,apparent_temperature,weather_code,cloud_cover,wind_speed_10m,wind_gusts_10m,is_day" +
+#ifdef POS_WIND
+          ",wind_direction_10m" +
+#endif
+#ifdef POS_HUMIDITY
+          ",relative_humidity_2m" +
+#endif
+#ifdef POS_PRESSURE
+          ",surface_pressure" +
+#endif
+#ifdef POS_VISIBILITY
+          ",visibility" +
+#endif
+#ifdef POS_DEW_POINT
+          ",dew_point_2m" +
+#endif
+
+          "&hourly=temperature_2m" +
+#if DISPLAY_HOURLY_ICONS
+          ",weather_code,cloud_cover,wind_speed_10m,wind_gusts_10m,is_day" +
+#endif
+#if UNITS_HOURLY_PRECIP == POP
+          ",precipitation_probability" +
+#else
+          ",rain,snowfall" +
+#endif
+
+          "&daily=weather_code,cloud_cover_mean,wind_speed_10m_max,wind_gusts_10m_max,temperature_2m_max,temperature_2m_min" +
+#if UNITS_DAILY_PRECIP == POP
+          ",precipitation_probability_max" +
+#else
+          ",rain_sum,snowfall_sum" +
+#endif
+#ifdef POS_SUNRISE
+          ",sunrise" +
+#endif
+#ifdef POS_SUNSET
+          ",sunset" +
+#endif
+#ifdef POS_UVI
+          ",uv_index_max" +
+#endif
+          "&wind_speed_unit=ms&timezone=auto&timeformat=unixtime&forecast_days=5&forecast_hours=" + HOURLY_GRAPH_MAX;
 }
 
 String buildPollutionURL(char* startStr, char* endStr) {
