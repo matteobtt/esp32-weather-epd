@@ -8,7 +8,7 @@
 #if HTTP_MODE == HTTPS_WITH_CERT_VERIF
 #include "cert.h"
 
-const char* TLS_CERT = cert_USERTrust_RSA_Certification_Authority;
+const char* TLS_CERT = cert_Sectigo_Public_Server_Authentication_Root_R46;
 #endif
 
 const String SERVICE_NAME = "One Call " + OWM_ONECALL_VERSION + " API";
