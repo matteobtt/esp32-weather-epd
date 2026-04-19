@@ -19,6 +19,7 @@
 #define __CLIENT_UTILS_H__
 
 #include <WiFi.h>
+#include <ArduinoJson.h>
 #include "api_response.h"
 
 wl_status_t startWiFi(int &wifiRSSI);
@@ -28,7 +29,7 @@ bool printLocalTime(tm *timeInfo);
 
 bool makeAPICalls(owm_resp_onecall_t &resp_main, owm_resp_air_pollution_t &resp_pollution);
 
-int getMainData(WiFiClient &client, owm_resp_onecall_t &r);
-int getPollutionData(WiFiClient &client, owm_resp_air_pollution_t &r);
+template <typename T>
+int getData(WiFiClient &client, String host, String url, T &r, DeserializationError(*deserializeCall)(Stream&, T&));
 
 #endif

@@ -139,7 +139,8 @@ bool makeAPICalls(owm_resp_onecall_t &resp_main, owm_resp_air_pollution_t &resp_
   client.setCACert(TLS_CERT);
 #endif
 
-  int rxStatus = getMainData(client, resp_main);
+  String url = buildMainURL();
+  int rxStatus = getData(client, DOMAIN_MAIN, url, resp_main, deserializeMainCall);
   if (rxStatus != HTTP_CODE_OK)
   {
     serviceName = SERVICE_NAME;
@@ -149,7 +150,19 @@ bool makeAPICalls(owm_resp_onecall_t &resp_main, owm_resp_air_pollution_t &resp_
   }
 
 #ifdef POS_AIR_QUALITY
-  rxStatus = getPollutionData(client, resp_pollution);
+  // set start and end to appropriate values so that the last 24 hours of air
+  // pollution history is returned. Unix, UTC.
+  time_t now;
+  int64_t end = time(&now);
+  // minus 1 is important here, otherwise we could get an extra hour of history
+  int64_t start = end - ((3600 * OWM_NUM_AIR_POLLUTION) - 1);
+  char endStr[22];
+  char startStr[22];
+  sprintf(endStr, "%lld", end);
+  sprintf(startStr, "%lld", start);
+  url = buildPollutionURL(startStr, endStr);
+
+  rxStatus = getData(client, DOMAIN_POLLUTION, url, resp_pollution, deserializeAirQuality);
   if (rxStatus != HTTP_CODE_OK)
   {
     serviceName = "Air Pollution API";
@@ -162,27 +175,23 @@ bool makeAPICalls(owm_resp_onecall_t &resp_main, owm_resp_air_pollution_t &resp_
   return true;
 }
 
-/* Perform an HTTP GET request to the main weather API
+/* Perform an HTTP GET request to get the weather or air quality
  * If data is received, it will be parsed and stored in the global variable
- * owm_onecall.
+ * owm_onecall or owm_air_pollution.
  *
  * Returns the HTTP Status Code.
  */
-int getMainData(WiFiClient &client, owm_resp_onecall_t &r)
+template <typename T>
+int getData(WiFiClient &client, String host, String url, T &r, DeserializationError(*deserializeCall)(Stream&, T&))
 {
   int attempts = 0;
   bool rxSuccess = false;
   DeserializationError jsonErr = {};
-#if HTTP_MODE == HTTP
-  String scheme = "http://";
-#else
-  String scheme = "https://";
-#endif
-  String url = buildMainURL();
+  String scheme = HTTP_MODE == HTTP ? "http://" : "https://";
 
   // This string is printed to terminal to help with debugging. The API key is
   // censored to reduce the risk of users exposing their key.
-  String sanitizedUrl = scheme + DOMAIN_MAIN + url + getAPIKeyParam("{API key}");
+  String sanitizedUrl = scheme + host + url + getAPIKeyParam("{API key}");
 
   url += getAPIKeyParam(OWM_APIKEY);
 
@@ -203,7 +212,7 @@ int getMainData(WiFiClient &client, owm_resp_onecall_t &r)
     http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
     const char* keys[] = {"Transfer-Encoding"};
     http.collectHeaders(keys, 1);
-    http.begin(client, DOMAIN_MAIN, PORT, url);
+    http.begin(client, host, PORT, url);
     httpResponse = http.GET();
     if (httpResponse == HTTP_CODE_OK)
     {
@@ -214,7 +223,7 @@ int getMainData(WiFiClient &client, owm_resp_onecall_t &r)
       {
         response = new ChunkDecodingStream(rawStream);
       }
-      jsonErr = deserializeMainCall(*response, r);
+      jsonErr = deserializeCall(*response, r);
       if (jsonErr)
       {
         // -256 offset distinguishes these errors from httpClient errors
@@ -229,87 +238,7 @@ int getMainData(WiFiClient &client, owm_resp_onecall_t &r)
   }
 
   return httpResponse;
-} // getMainData
-
-/* Perform an HTTP GET request to get the air quality
- * If data is received, it will be parsed and stored in the global variable
- * owm_air_pollution.
- *
- * Returns the HTTP Status Code.
- */
-int getPollutionData(WiFiClient &client, owm_resp_air_pollution_t &r)
-{
-  int attempts = 0;
-  bool rxSuccess = false;
-  DeserializationError jsonErr = {};
-
-  // set start and end to appropriate values so that the last 24 hours of air
-  // pollution history is returned. Unix, UTC.
-  time_t now;
-  int64_t end = time(&now);
-  // minus 1 is important here, otherwise we could get an extra hour of history
-  int64_t start = end - ((3600 * OWM_NUM_AIR_POLLUTION) - 1);
-  char endStr[22];
-  char startStr[22];
-  sprintf(endStr, "%lld", end);
-  sprintf(startStr, "%lld", start);
-#if HTTP_MODE == HTTP
-  String scheme = "http://";
-#else
-  String scheme = "https://";
-#endif
-  String url = buildPollutionURL(startStr, endStr);
-
-  // This string is printed to terminal to help with debugging. The API key is
-  // censored to reduce the risk of users exposing their key.
-  String sanitizedUrl = scheme + DOMAIN_POLLUTION + url + getAPIKeyParam("{API key}");
-
-  url += getAPIKeyParam(OWM_APIKEY);
-
-  Serial.print(TXT_ATTEMPTING_HTTP_REQ);
-  Serial.println(": " + sanitizedUrl);
-  int httpResponse = 0;
-  while (!rxSuccess && attempts < 3)
-  {
-    wl_status_t connection_status = WiFi.status();
-    if (connection_status != WL_CONNECTED)
-    {
-      // -512 offset distinguishes these errors from httpClient errors
-      return -512 - static_cast<int>(connection_status);
-    }
-
-    HTTPClient http;
-    http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
-    http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
-    const char* keys[] = {"Transfer-Encoding"};
-    http.collectHeaders(keys, 1);
-    http.begin(client, DOMAIN_POLLUTION, PORT, url);
-    httpResponse = http.GET();
-    if (httpResponse == HTTP_CODE_OK)
-    {
-      Stream& rawStream = http.getStream();
-      // Choose the right stream depending on the Transfer-Encoding header
-      Stream* response = &rawStream;
-      if (http.header("Transfer-Encoding") == "chunked")
-      {
-        response = new ChunkDecodingStream(rawStream);
-      }
-      jsonErr = deserializeAirQuality(*response, r);
-      if (jsonErr)
-      {
-        // -256 offset distinguishes these errors from httpClient errors
-        httpResponse = -256 - static_cast<int>(jsonErr.code());
-      }
-      rxSuccess = !jsonErr;
-    }
-    client.stop();
-    http.end();
-    Serial.println("  " + String(httpResponse, DEC) + " " + getHttpResponsePhrase(httpResponse));
-    ++attempts;
-  }
-
-  return httpResponse;
-} // getPollutionData
+}
 
 /* Prints debug information about heap usage.
  */
