@@ -69,8 +69,8 @@ String buildPollutionURL(char* startStr, char* endStr) {
           "forecast_hours=0&timeformat=unixtime";
 }
 
-String buildSanitizedURL(String url) {
-  return url;
+String getAPIKeyParam(String key) {
+  return "";
 }
 
 DeserializationError deserializeMainCall(Stream &json,

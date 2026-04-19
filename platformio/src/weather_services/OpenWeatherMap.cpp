@@ -27,11 +27,11 @@ String buildMainURL() {
 }
 
 String buildPollutionURL(char* startStr, char* endStr) {
-  return "/data/2.5/air_pollution/history?lat=" + LAT + "&lon=" + LON + "&start=" + startStr + "&end=" + endStr + "&appid=" + OWM_APIKEY;
+  return "/data/2.5/air_pollution/history?lat=" + LAT + "&lon=" + LON + "&start=" + startStr + "&end=" + endStr;
 }
 
-String buildSanitizedURL(String url) {
-  return url + "&appid={API key}";
+String getAPIKeyParam(String key) {
+  return "&appid=" + key;
 }
 
 DeserializationError deserializeMainCall(Stream &json,

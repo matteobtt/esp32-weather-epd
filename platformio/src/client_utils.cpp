@@ -173,13 +173,18 @@ int getMainData(WiFiClient &client, owm_resp_onecall_t &r)
   int attempts = 0;
   bool rxSuccess = false;
   DeserializationError jsonErr = {};
+#if HTTP_MODE == HTTP
+  String scheme = "http://";
+#else
+  String scheme = "https://";
+#endif
   String url = buildMainURL();
 
   // This string is printed to terminal to help with debugging. The API key is
   // censored to reduce the risk of users exposing their key.
-  String sanitizedUrl = buildSanitizedURL(DOMAIN_MAIN + url);
+  String sanitizedUrl = scheme + DOMAIN_MAIN + url + getAPIKeyParam("{API key}");
 
-  url += "&appid=" + OWM_APIKEY;
+  url += getAPIKeyParam(OWM_APIKEY);
 
   Serial.print(TXT_ATTEMPTING_HTTP_REQ);
   Serial.println(": " + sanitizedUrl);
@@ -248,10 +253,18 @@ int getPollutionData(WiFiClient &client, owm_resp_air_pollution_t &r)
   char startStr[22];
   sprintf(endStr, "%lld", end);
   sprintf(startStr, "%lld", start);
+#if HTTP_MODE == HTTP
+  String scheme = "http://";
+#else
+  String scheme = "https://";
+#endif
   String url = buildPollutionURL(startStr, endStr);
+
   // This string is printed to terminal to help with debugging. The API key is
   // censored to reduce the risk of users exposing their key.
-  String sanitizedUrl = buildSanitizedURL(DOMAIN_POLLUTION + url);
+  String sanitizedUrl = scheme + DOMAIN_POLLUTION + url + getAPIKeyParam("{API key}");
+
+  url += getAPIKeyParam(OWM_APIKEY);
 
   Serial.print(TXT_ATTEMPTING_HTTP_REQ);
   Serial.println(": " + sanitizedUrl);

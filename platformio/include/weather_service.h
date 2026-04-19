@@ -33,7 +33,7 @@ extern const char* DOMAIN_POLLUTION;
 
 String buildMainURL();
 String buildPollutionURL(char* startStr, char* endStr);
-String buildSanitizedURL(String url);
+String getAPIKeyParam(String key);
 DeserializationError deserializeMainCall(Stream &json,
                                         owm_resp_onecall_t &r);
 DeserializationError deserializeAirQuality(Stream &json,
