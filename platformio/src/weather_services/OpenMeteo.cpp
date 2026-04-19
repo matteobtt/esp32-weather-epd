@@ -73,7 +73,7 @@ String buildSanitizedURL(String url) {
   return url;
 }
 
-DeserializationError deserializeMainCall(WiFiClient &json,
+DeserializationError deserializeMainCall(Stream &json,
                                               owm_resp_onecall_t &r)
 {
   JsonDocument doc;
@@ -177,7 +177,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
   return error;
 } // end deserializeOpenMeteoCall
 
-DeserializationError deserializeAirQuality(WiFiClient &json,
+DeserializationError deserializeAirQuality(Stream &json,
                                            owm_resp_air_pollution_t &r)
 {
   JsonDocument doc;

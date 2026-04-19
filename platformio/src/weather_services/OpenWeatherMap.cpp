@@ -34,7 +34,7 @@ String buildSanitizedURL(String url) {
   return url + "&appid={API key}";
 }
 
-DeserializationError deserializeMainCall(WiFiClient &json,
+DeserializationError deserializeMainCall(Stream &json,
                                         owm_resp_onecall_t &r)
 {
   int i;
@@ -162,7 +162,7 @@ DeserializationError deserializeMainCall(WiFiClient &json,
   return error;
 } // end deserializeMainCall
 
-DeserializationError deserializeAirQuality(WiFiClient &json,
+DeserializationError deserializeAirQuality(Stream &json,
                                            owm_resp_air_pollution_t &r)
 {
   int i = 0;

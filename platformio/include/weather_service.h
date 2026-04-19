@@ -34,9 +34,9 @@ extern const char* DOMAIN_POLLUTION;
 String buildMainURL();
 String buildPollutionURL(char* startStr, char* endStr);
 String buildSanitizedURL(String url);
-DeserializationError deserializeMainCall(WiFiClient &json,
+DeserializationError deserializeMainCall(Stream &json,
                                         owm_resp_onecall_t &r);
-DeserializationError deserializeAirQuality(WiFiClient &json,
+DeserializationError deserializeAirQuality(Stream &json,
                                            owm_resp_air_pollution_t &r);
 
 #endif

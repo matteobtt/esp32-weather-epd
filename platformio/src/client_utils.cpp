@@ -24,6 +24,7 @@
 #include "display_utils.h"
 #include "renderer.h"
 #include "icons/icons_196x196.h"
+#include <StreamUtils.h>
 
 #if HTTP_MODE != HTTP
   #include <WiFiClientSecure.h>
@@ -195,12 +196,20 @@ int getMainData(WiFiClient &client, owm_resp_onecall_t &r)
     HTTPClient http;
     http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
     http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
-    http.useHTTP10(true);
+    const char* keys[] = {"Transfer-Encoding"};
+    http.collectHeaders(keys, 1);
     http.begin(client, DOMAIN_MAIN, PORT, url);
     httpResponse = http.GET();
     if (httpResponse == HTTP_CODE_OK)
     {
-      jsonErr = deserializeMainCall(http.getStream(), r);
+      Stream& rawStream = http.getStream();
+      // Choose the right stream depending on the Transfer-Encoding header
+      Stream* response = &rawStream;
+      if (http.header("Transfer-Encoding") == "chunked")
+      {
+        response = new ChunkDecodingStream(rawStream);
+      }
+      jsonErr = deserializeMainCall(*response, r);
       if (jsonErr)
       {
         // -256 offset distinguishes these errors from httpClient errors
@@ -259,15 +268,23 @@ int getPollutionData(WiFiClient &client, owm_resp_air_pollution_t &r)
     HTTPClient http;
     http.setConnectTimeout(HTTP_CLIENT_TCP_TIMEOUT); // default 5000ms
     http.setTimeout(HTTP_CLIENT_TCP_TIMEOUT);        // default 5000ms
-    http.useHTTP10(true);
+    const char* keys[] = {"Transfer-Encoding"};
+    http.collectHeaders(keys, 1);
     http.begin(client, DOMAIN_POLLUTION, PORT, url);
     httpResponse = http.GET();
     if (httpResponse == HTTP_CODE_OK)
     {
-      jsonErr = deserializeAirQuality(http.getStream(), r);
+      Stream& rawStream = http.getStream();
+      // Choose the right stream depending on the Transfer-Encoding header
+      Stream* response = &rawStream;
+      if (http.header("Transfer-Encoding") == "chunked")
+      {
+        response = new ChunkDecodingStream(rawStream);
+      }
+      jsonErr = deserializeAirQuality(*response, r);
       if (jsonErr)
       {
-        // -256 offset to distinguishes these errors from httpClient errors
+        // -256 offset distinguishes these errors from httpClient errors
         httpResponse = -256 - static_cast<int>(jsonErr.code());
       }
       rxSuccess = !jsonErr;
