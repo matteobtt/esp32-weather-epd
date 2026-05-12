@@ -27,7 +27,7 @@ const unsigned long WIFI_TIMEOUT = 10000; // ms, WiFi connection timeout.
 //   -1   Connection Refused
 //   -11  Read Timeout
 //   -258 Deserialization Incomplete Input
-const unsigned HTTP_CLIENT_TCP_TIMEOUT = 10000; // ms
+const unsigned HTTP_CLIENT_TCP_TIMEOUT = 30000; // ms
 
 // OPENWEATHERMAP API
 // OpenWeatherMap API key, https://openweathermap.org/
